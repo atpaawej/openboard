@@ -1,0 +1,35 @@
+{
+  "name": "@openboard/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "start": "node ./dist/main.js",
+    "dev": "node --watch ./src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test dist/__tests__/*.test.js"
+  },
+  "dependencies": {
+    "@openboard/core": "*",
+    "@openboard/mcp": "*",
+    "@openboard/shared": "*",
+    "@openboard/storage": "*",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "typescript": "^5.7.3"
+  }
+}

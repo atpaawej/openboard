@@ -1,0 +1,28 @@
+{
+  "name": "@openboard/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test dist/__tests__/*.test.js"
+  },
+  "dependencies": {
+    "@openboard/core": "*",
+    "@openboard/shared": "*"
+  },
+  "devDependencies": {
+    "@openboard/storage": "*",
+    "typescript": "^5.7.3"
+  }
+}
