@@ -1,0 +1,34 @@
+{
+  "name": "openboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CLI for OpenBoard — local-first personal whiteboard workspace",
+  "type": "module",
+  "bin": {
+    "openboard": "./bin/openboard.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openboard/core": "*",
+    "@openboard/server": "*",
+    "@openboard/shared": "*",
+    "@openboard/storage": "*",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
