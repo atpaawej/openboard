@@ -37,6 +37,6 @@ jobs:
             pkg.publishConfig = { registry: "https://npm.pkg.github.com", access: "public" };
             fs.writeFileSync("cli/package.json", JSON.stringify(pkg, null, 2) + "\n");
           '
-          npm publish --workspace=openboard-app
+          cd cli && npm publish --registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
