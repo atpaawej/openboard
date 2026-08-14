@@ -330,12 +330,14 @@ export class OpenBoardMcpServer {
                   start: {
                     type: 'object',
                     properties: { x: { type: 'number' }, y: { type: 'number' } },
-                    description: 'Relative start point for arrow if not bound to a shape',
+                    description:
+                      'For unbound arrows: start handle offset in pixels relative to shape (x, y). Defaults to { "x": 0, "y": 0 }',
                   },
                   end: {
                     type: 'object',
                     properties: { x: { type: 'number' }, y: { type: 'number' } },
-                    description: 'Relative end point for arrow if not bound to a shape',
+                    description:
+                      'For unbound arrows: end handle offset in pixels relative to shape (x, y) (e.g. { "x": 0, "y": 160 } for a vertical line or { "x": 120, "y": 0 } for horizontal). Defaults to { "x": 120, "y": 0 }',
                   },
                 },
                 required: ['x', 'y'],
@@ -390,6 +392,18 @@ export class OpenBoardMcpServer {
                   to: {
                     type: 'string',
                     description: 'For arrows: update target shape ID connection',
+                  },
+                  start: {
+                    type: 'object',
+                    properties: { x: { type: 'number' }, y: { type: 'number' } },
+                    description:
+                      'For unbound arrows: update start handle offset in pixels relative to shape (x, y)',
+                  },
+                  end: {
+                    type: 'object',
+                    properties: { x: { type: 'number' }, y: { type: 'number' } },
+                    description:
+                      'For unbound arrows: update end handle offset in pixels relative to shape (x, y)',
                   },
                 },
                 required: ['id'],

@@ -145,3 +145,61 @@ test('CanvasService & HeadlessCanvasEngine - full headless CRUD and state querie
 
   repository.close();
 });
+
+test('CanvasService - unbound arrow creation, updating and accurate bounds computation', async () => {
+  const repository = new SQLiteBoardRepository({ dbPath: ':memory:' });
+  const boardService = new BoardService(repository);
+  const canvasService = new CanvasService(boardService);
+
+  const board = await boardService.createBoard({ name: 'Arrow Test Board' });
+  const boardId = board.metadata.id;
+
+  // 1. Create unbound vertical arrow (Issue #1 repro values)
+  await canvasService.createShapes(boardId, [
+    {
+      id: 'vertical_arrow',
+      type: 'arrow',
+      x: 400,
+      y: 210,
+      start: { x: 0, y: 0 },
+      end: { x: 0, y: 160 },
+      text: 'Vertical Flow',
+    },
+  ]);
+
+  const state1 = await canvasService.getCanvasState(boardId);
+  assert.equal(state1.shapesCount, 1);
+  const arrow1 = state1.shapes[0]!;
+  assert.deepEqual(arrow1.start, { x: 0, y: 0 });
+  assert.deepEqual(arrow1.end, { x: 0, y: 160 });
+  // Bounds should be: minX=400, minY=210, maxX=400, maxY=370, width=0, height=160
+  assert.equal(state1.bounds.minX, 400);
+  assert.equal(state1.bounds.minY, 210);
+  assert.equal(state1.bounds.maxX, 400);
+  assert.equal(state1.bounds.maxY, 370);
+  assert.equal(state1.bounds.width, 0);
+  assert.equal(state1.bounds.height, 160);
+
+  // 2. Update unbound arrow start/end
+  await canvasService.updateShapes(boardId, [
+    {
+      id: 'vertical_arrow',
+      start: { x: 10, y: 20 },
+      end: { x: 50, y: 180 },
+    },
+  ]);
+
+  const state2 = await canvasService.getCanvasState(boardId);
+  const updatedArrow = state2.shapes[0]!;
+  assert.deepEqual(updatedArrow.start, { x: 10, y: 20 });
+  assert.deepEqual(updatedArrow.end, { x: 50, y: 180 });
+  // Bounds: minX=410, minY=230, maxX=450, maxY=390, width=40, height=160
+  assert.equal(state2.bounds.minX, 410);
+  assert.equal(state2.bounds.minY, 230);
+  assert.equal(state2.bounds.maxX, 450);
+  assert.equal(state2.bounds.maxY, 390);
+  assert.equal(state2.bounds.width, 40);
+  assert.equal(state2.bounds.height, 160);
+
+  repository.close();
+});

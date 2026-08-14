@@ -219,24 +219,75 @@ export class HeadlessSvgRenderer {
       maxY = -Infinity;
 
       for (const shape of shapes) {
-        const x = Number(shape.x) || 0;
-        const y = Number(shape.y) || 0;
+        const x = typeof shape.x === 'number' && !isNaN(shape.x) ? shape.x : Number(shape.x) || 0;
+        const y = typeof shape.y === 'number' && !isNaN(shape.y) ? shape.y : Number(shape.y) || 0;
         const props = shape.props || {};
-        const w = Number(props.w) || (shape.type === 'note' ? 200 : 120);
-        const h = Number(props.h) || (shape.type === 'note' ? 200 : 80);
 
-        let shapeMaxX = x + w;
-        let shapeMaxY = y + h;
+        if (shape.type === 'arrow') {
+          const startBinding = bindings.find(
+            (b) => b.fromId === shape.id && b.props?.terminal === 'start',
+          );
+          const endBinding = bindings.find(
+            (b) => b.fromId === shape.id && b.props?.terminal === 'end',
+          );
 
-        if (shape.type === 'arrow' && props.end) {
-          shapeMaxX = Math.max(shapeMaxX, x + (Number(props.end.x) || 0));
-          shapeMaxY = Math.max(shapeMaxY, y + (Number(props.end.y) || 0));
+          const startOffsetX =
+            typeof props.start?.x === 'number' && !isNaN(props.start.x)
+              ? props.start.x
+              : Number(props.start?.x) || 0;
+          const startOffsetY =
+            typeof props.start?.y === 'number' && !isNaN(props.start.y)
+              ? props.start.y
+              : Number(props.start?.y) || 0;
+          const endOffsetX =
+            typeof props.end?.x === 'number' && !isNaN(props.end.x)
+              ? props.end.x
+              : props.end?.x !== undefined
+                ? Number(props.end.x) || 0
+                : 120;
+          const endOffsetY =
+            typeof props.end?.y === 'number' && !isNaN(props.end.y)
+              ? props.end.y
+              : Number(props.end?.y) || 0;
+
+          let startX = x + startOffsetX;
+          let startY = y + startOffsetY;
+          let endX = x + endOffsetX;
+          let endY = y + endOffsetY;
+
+          if (startBinding) {
+            const targetShape = shapesById.get(startBinding.toId);
+            if (targetShape) {
+              const tw = Number(targetShape.props?.w) || 100;
+              const th = Number(targetShape.props?.h) || 80;
+              startX = Number(targetShape.x) + tw / 2;
+              startY = Number(targetShape.y) + th / 2;
+            }
+          }
+
+          if (endBinding) {
+            const targetShape = shapesById.get(endBinding.toId);
+            if (targetShape) {
+              const tw = Number(targetShape.props?.w) || 100;
+              const th = Number(targetShape.props?.h) || 80;
+              endX = Number(targetShape.x) + tw / 2;
+              endY = Number(targetShape.y) + th / 2;
+            }
+          }
+
+          minX = Math.min(minX, startX, endX);
+          minY = Math.min(minY, startY, endY);
+          maxX = Math.max(maxX, startX, endX);
+          maxY = Math.max(maxY, startY, endY);
+        } else {
+          const w = Number(props.w) || (shape.type === 'note' ? 200 : 120);
+          const h = Number(props.h) || (shape.type === 'note' ? 200 : 80);
+
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x + w);
+          maxY = Math.max(maxY, y + h);
         }
-
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, shapeMaxX);
-        maxY = Math.max(maxY, shapeMaxY);
       }
 
       width = Math.max(100, Math.round(maxX - minX));
@@ -533,10 +584,38 @@ export class HeadlessSvgRenderer {
     const theme = palette[colorKey] || palette.black || LIGHT_PALETTE.black!;
     const strokeColor = theme.stroke;
 
-    let startX = Number(arrowShape.x) || 0;
-    let startY = Number(arrowShape.y) || 0;
-    let endX = startX + (Number(props.end?.x) || 120);
-    let endY = startY + (Number(props.end?.y) || 0);
+    const arrowX =
+      typeof arrowShape.x === 'number' && !isNaN(arrowShape.x)
+        ? arrowShape.x
+        : Number(arrowShape.x) || 0;
+    const arrowY =
+      typeof arrowShape.y === 'number' && !isNaN(arrowShape.y)
+        ? arrowShape.y
+        : Number(arrowShape.y) || 0;
+
+    const startOffsetX =
+      typeof props.start?.x === 'number' && !isNaN(props.start.x)
+        ? props.start.x
+        : Number(props.start?.x) || 0;
+    const startOffsetY =
+      typeof props.start?.y === 'number' && !isNaN(props.start.y)
+        ? props.start.y
+        : Number(props.start?.y) || 0;
+    const endOffsetX =
+      typeof props.end?.x === 'number' && !isNaN(props.end.x)
+        ? props.end.x
+        : props.end?.x !== undefined
+          ? Number(props.end.x) || 0
+          : 120;
+    const endOffsetY =
+      typeof props.end?.y === 'number' && !isNaN(props.end.y)
+        ? props.end.y
+        : Number(props.end?.y) || 0;
+
+    let startX = arrowX + startOffsetX;
+    let startY = arrowY + startOffsetY;
+    let endX = arrowX + endOffsetX;
+    let endY = arrowY + endOffsetY;
 
     // Look up bindings for this arrow
     const startBinding = bindings.find(

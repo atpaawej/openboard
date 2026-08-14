@@ -150,7 +150,13 @@ export interface CreateShapeInput {
   fill?: string; // 'none' | 'semi' | 'solid' | 'pattern'
   rotation?: number;
   parentId?: string;
+  /**
+   * For unbound arrows: start handle offset in pixels relative to shape (x, y). Defaults to { x: 0, y: 0 }.
+   */
   start?: CanvasPoint;
+  /**
+   * For unbound arrows: end handle offset in pixels relative to shape (x, y). Defaults to { x: 120, y: 0 }.
+   */
   end?: CanvasPoint;
   points?: CanvasPoint[];
   name?: string;
@@ -182,7 +188,13 @@ export interface UpdateShapeInput {
   rotation?: number;
   isLocked?: boolean;
   opacity?: number;
+  /**
+   * For unbound arrows: updated start handle offset in pixels relative to shape (x, y).
+   */
   start?: CanvasPoint;
+  /**
+   * For unbound arrows: updated end handle offset in pixels relative to shape (x, y).
+   */
   end?: CanvasPoint;
   /**
    * For arrows: update shape ID to bind start of arrow to.

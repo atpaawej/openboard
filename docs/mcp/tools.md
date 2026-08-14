@@ -178,16 +178,18 @@ Batch create shapes on a board.
     - `fill` _(string, optional)_: `"none"`, `"semi"`, `"solid"`, `"pattern"`.
     - `from` _(string, optional)_: For arrows: source shape ID.
     - `to` _(string, optional)_: For arrows: target shape ID.
+    - `start` _(object `{ x, y }`, optional)_: For unbound arrows: start handle offset in pixels relative to `(x, y)`. Defaults to `{ "x": 0, "y": 0 }`.
+    - `end` _(object `{ x, y }`, optional)_: For unbound arrows: end handle offset in pixels relative to `(x, y)`. Defaults to `{ "x": 120, "y": 0 }` (e.g. `{ "x": 0, "y": 160 }` for a vertical arrow).
 
 ---
 
 ### `update_shapes`
 
-Batch update shape positions, dimensions, text, styles, or arrow connections.
+Batch update shape positions, dimensions, text, styles, start/end handle offsets, or arrow connections.
 
 - **Parameters:**
   - `board_id` _(string, required)_: Target board ID.
-  - `shapes` _(array, required)_: Array of updates with `id`.
+  - `shapes` _(array, required)_: Array of updates with `id`, `x`, `y`, `w`, `h`, `text`, `color`, `fill`, `geo`, `rotation`, `from`, `to`, `start`, `end`.
 
 ---
 

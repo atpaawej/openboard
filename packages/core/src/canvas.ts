@@ -253,20 +253,42 @@ export class HeadlessCanvasEngine {
     let maxY = -Infinity;
 
     for (const shape of shapes) {
-      const x1 = shape.x;
-      const y1 = shape.y;
-      let x2 = x1 + (shape.w ?? 100);
-      let y2 = y1 + (shape.h ?? 100);
+      if (shape.type === 'arrow') {
+        const startOffsetX =
+          typeof shape.start?.x === 'number' && !isNaN(shape.start.x) ? shape.start.x : 0;
+        const startOffsetY =
+          typeof shape.start?.y === 'number' && !isNaN(shape.start.y) ? shape.start.y : 0;
+        const endOffsetX =
+          typeof shape.end?.x === 'number' && !isNaN(shape.end.x)
+            ? shape.end.x
+            : shape.end?.x !== undefined
+              ? Number(shape.end.x) || 0
+              : 120;
+        const endOffsetY =
+          typeof shape.end?.y === 'number' && !isNaN(shape.end.y)
+            ? shape.end.y
+            : Number(shape.end?.y) || 0;
 
-      if (shape.end) {
-        x2 = Math.max(x2, x1 + shape.end.x);
-        y2 = Math.max(y2, y1 + shape.end.y);
+        const startX = shape.x + startOffsetX;
+        const startY = shape.y + startOffsetY;
+        const endX = shape.x + endOffsetX;
+        const endY = shape.y + endOffsetY;
+
+        minX = Math.min(minX, startX, endX);
+        minY = Math.min(minY, startY, endY);
+        maxX = Math.max(maxX, startX, endX);
+        maxY = Math.max(maxY, startY, endY);
+      } else {
+        const x1 = shape.x;
+        const y1 = shape.y;
+        const x2 = x1 + (shape.w ?? 100);
+        const y2 = y1 + (shape.h ?? 100);
+
+        if (x1 < minX) minX = x1;
+        if (y1 < minY) minY = y1;
+        if (x2 > maxX) maxX = x2;
+        if (y2 > maxY) maxY = y2;
       }
-
-      if (x1 < minX) minX = x1;
-      if (y1 < minY) minY = y1;
-      if (x2 > maxX) maxX = x2;
-      if (y2 > maxY) maxY = y2;
     }
 
     return {
@@ -395,10 +417,16 @@ export class CanvasService {
       }
 
       if (input.start && type === 'arrow') {
-        props.start = { x: input.start.x, y: input.start.y };
+        props.start = {
+          x: typeof input.start.x === 'number' && !isNaN(input.start.x) ? input.start.x : Number(input.start.x) || 0,
+          y: typeof input.start.y === 'number' && !isNaN(input.start.y) ? input.start.y : Number(input.start.y) || 0,
+        };
       }
       if (input.end && type === 'arrow') {
-        props.end = { x: input.end.x, y: input.end.y };
+        props.end = {
+          x: typeof input.end.x === 'number' && !isNaN(input.end.x) ? input.end.x : Number(input.end.x) || 0,
+          y: typeof input.end.y === 'number' && !isNaN(input.end.y) ? input.end.y : Number(input.end.y) || 0,
+        };
       }
 
       // Handle arrow bindings if "from" or "to" are specified
@@ -528,10 +556,16 @@ export class CanvasService {
       }
 
       if (update.start && type === 'arrow') {
-        updatedProps.start = { x: update.start.x, y: update.start.y };
+        updatedProps.start = {
+          x: typeof update.start.x === 'number' && !isNaN(update.start.x) ? update.start.x : Number(update.start.x) || 0,
+          y: typeof update.start.y === 'number' && !isNaN(update.start.y) ? update.start.y : Number(update.start.y) || 0,
+        };
       }
       if (update.end && type === 'arrow') {
-        updatedProps.end = { x: update.end.x, y: inputEndClamp(update.end) };
+        updatedProps.end = {
+          x: typeof update.end.x === 'number' && !isNaN(update.end.x) ? update.end.x : Number(update.end.x) || 0,
+          y: typeof update.end.y === 'number' && !isNaN(update.end.y) ? update.end.y : Number(update.end.y) || 0,
+        };
       }
 
       // Handle arrow bindings update
@@ -662,8 +696,4 @@ export class CanvasService {
       deletedShapeIds: toDelete.map(String),
     };
   }
-}
-
-function inputEndClamp(end: { x: number; y: number }): { x: number; y: number } {
-  return { x: Number(end.x) || 0, y: Number(end.y) || 0 };
 }
