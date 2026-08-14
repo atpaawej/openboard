@@ -3,7 +3,7 @@
 Local-first whiteboard for humans and AI agents.
 
 ```bash
-npm install -g openboard
+npm install -g open-board
 openboard start
 ```
 

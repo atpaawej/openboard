@@ -1,10 +1,11 @@
 {
-  "name": "openboard",
+  "name": "openboard-app",
   "version": "0.1.0",
   "description": "Local-first whiteboard for humans and AI agents",
   "type": "module",
   "bin": {
-    "openboard": "./bin/openboard.js"
+    "openboard": "bin/openboard.js",
+    "open-board": "bin/openboard.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,7 +25,7 @@
   "homepage": "https://github.com/atpaawej/openboard#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atpaawej/openboard.git"
+    "url": "git+https://github.com/atpaawej/openboard.git"
   },
   "bugs": {
     "url": "https://github.com/atpaawej/openboard/issues"
