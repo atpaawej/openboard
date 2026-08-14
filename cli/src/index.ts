@@ -5,7 +5,7 @@ const program = new Command();
 program
   .name('openboard')
   .description('Local-first personal whiteboard workspace for developers and external AI agents')
-  .version('0.1.1', '-v, --version', 'Output OpenBoard current version');
+  .version('0.1.2', '-v, --version', 'Output OpenBoard current version');
 
 program
   .command('start')

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.2] - 2026-08-14
+
+### Bug Fixes & Improvements
+
+- **Fixed Unbound Arrow Coordinate Rendering & Bounds Computation (Issue #1)**
+  - Replaced falsy logical OR coordinate checks (`Number(props.end?.x) || 120`) in `HeadlessSvgRenderer` with strict numeric parsing, ensuring `0` values (e.g. vertical arrows with `end: { x: 0, y: 160 }`) are preserved without phantom horizontal offsets.
+  - Added support for `props.start` offset handle coordinates in SVG arrow rendering.
+  - Corrected arrow bounding box calculation in both `HeadlessCanvasEngine.computeBounds` and `HeadlessSvgRenderer.render` to compute accurate bounds from arrow endpoints and bindings.
+
+- **Enabled Arrow Handle Modification & Unbinding in `update_shapes` (Issue #2)**
+  - Added `start` and `end` handle offset properties to the `update_shapes` MCP JSON schema.
+  - Fixed `updatedProps.end` coordinate assignment in `CanvasService.updateShapes`.
+  - Added support for dynamically unbinding arrow endpoints when `from: ""` or `to: ""` is passed.
+
+- **Normalized Text Shape Properties & Improved Canvas State Summaries (Issue #3)**
+  - Allowed `text` shapes to accept `w` (wrap width) without throwing tldraw validation errors on `h`.
+  - Automatically stripped unsupported `h` from `text` shapes and `w`/`h` from `note`, `arrow`, and `line` shapes in `HeadlessCanvasEngine.createStore` and `TldrawDocumentAdapter.normalizeRecords`.
+  - Improved `get_canvas_state` shape summaries to report realistic geometric bounds for `text` and `note` shapes instead of default `w: 8` placeholders.
+
+---
+
+## [0.1.1] - 2026-08-14
+
+### Features & Server Enhancements
+
+- **HTTP & SSE MCP Endpoints**
+  - Integrated `/mcp` HTTP POST endpoint and `/mcp/sse` Server-Sent Events endpoint into the local server (`openboard start`).
+  - Added support for remote agent transports alongside native stdio.
+
+---
+
 ## [0.1.0] - 2026-08-14
 
 Initial public release of OpenBoard — the local-first personal whiteboard workspace for developers and external AI agents.
