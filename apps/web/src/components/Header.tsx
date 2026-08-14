@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useHealthCheck } from '../hooks/useHealthCheck.js';
+import { IconLogo } from './icons/Icons.js';
 
 export const Header: React.FC = () => {
   const { isConnected, data } = useHealthCheck();
@@ -8,7 +9,9 @@ export const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="brand">
-        <span className="brand-icon">✦</span>
+        <span className="sidebar-brand-icon">
+          <IconLogo size={16} />
+        </span>
         <span className="brand-title">OpenBoard</span>
       </div>
 
@@ -30,15 +33,12 @@ export const Header: React.FC = () => {
       <div
         className="header-status"
         style={{
-          color: isConnected ? 'var(--status-success)' : '#ef4444',
-          backgroundColor: isConnected ? 'var(--status-success-bg)' : 'rgba(239, 68, 68, 0.12)',
+          color: isConnected ? 'var(--success)' : 'var(--danger)',
+          backgroundColor: isConnected ? 'var(--success-subtle)' : 'var(--danger-subtle)',
         }}
       >
         <span
-          className="status-dot"
-          style={{
-            backgroundColor: isConnected ? 'var(--status-success)' : '#ef4444',
-          }}
+          className={`status-dot ${isConnected ? 'active' : 'offline'}`}
         />
         <span>
           {isConnected ? `Local Engine (v${data?.version || '0.1.0'})` : 'Engine Offline'}

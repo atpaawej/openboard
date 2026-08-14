@@ -1,6 +1,16 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useHealthCheck } from '../hooks/useHealthCheck.js';
+import {
+  IconLogo,
+  IconGrid,
+  IconClock,
+  IconStar,
+  IconTrash,
+  IconBook,
+  IconSettings,
+  IconPlus,
+} from './icons/Icons.js';
 
 export const Sidebar: React.FC = () => {
   const { isConnected, data } = useHealthCheck();
@@ -12,7 +22,7 @@ export const Sidebar: React.FC = () => {
   const isDashboard = location.pathname === '/dashboard' || location.pathname === '/';
 
   const handleCreateClick = () => {
-    // If not on dashboard, go to dashboard first
+    // If not on dashboard, navigate to dashboard first
     if (!isDashboard) {
       navigate('/dashboard');
     }
@@ -26,7 +36,9 @@ export const Sidebar: React.FC = () => {
     <aside className="app-sidebar">
       <div className="sidebar-top">
         <div className="sidebar-brand">
-          <span className="sidebar-brand-icon">✦</span>
+          <span className="sidebar-brand-icon">
+            <IconLogo size={18} />
+          </span>
           <div>
             <span className="sidebar-brand-title">OpenBoard</span>
             <span className="sidebar-brand-subtitle">Local Workspace</span>
@@ -40,8 +52,10 @@ export const Sidebar: React.FC = () => {
           onClick={handleCreateClick}
           title="New Whiteboard (N)"
         >
-          <span>+</span>
-          <span>New Whiteboard</span>
+          <div className="sidebar-action-btn-left">
+            <IconPlus size={15} />
+            <span>New Whiteboard</span>
+          </div>
           <span className="kbd-shortcut-hint">N</span>
         </button>
 
@@ -56,7 +70,9 @@ export const Sidebar: React.FC = () => {
                 : 'sidebar-nav-item'
             }
           >
-            <span className="nav-item-icon">▦</span>
+            <span className="nav-item-icon">
+              <IconGrid size={16} />
+            </span>
             <span>All Boards</span>
           </NavLink>
 
@@ -68,7 +84,9 @@ export const Sidebar: React.FC = () => {
                 : 'sidebar-nav-item'
             }
           >
-            <span className="nav-item-icon">🕒</span>
+            <span className="nav-item-icon">
+              <IconClock size={16} />
+            </span>
             <span>Recent</span>
           </NavLink>
 
@@ -80,7 +98,9 @@ export const Sidebar: React.FC = () => {
                 : 'sidebar-nav-item'
             }
           >
-            <span className="nav-item-icon">★</span>
+            <span className="nav-item-icon">
+              <IconStar size={16} />
+            </span>
             <span>Favorites</span>
           </NavLink>
 
@@ -92,11 +112,13 @@ export const Sidebar: React.FC = () => {
                 : 'sidebar-nav-item'
             }
           >
-            <span className="nav-item-icon">🗑</span>
+            <span className="nav-item-icon">
+              <IconTrash size={16} />
+            </span>
             <span>Trash</span>
           </NavLink>
 
-          <div className="sidebar-nav-section-title" style={{ marginTop: '12px' }}>
+          <div className="sidebar-nav-section-title" style={{ marginTop: '14px' }}>
             Reference & System
           </div>
 
@@ -106,7 +128,9 @@ export const Sidebar: React.FC = () => {
               isActive ? 'sidebar-nav-item active' : 'sidebar-nav-item'
             }
           >
-            <span className="nav-item-icon">📖</span>
+            <span className="nav-item-icon">
+              <IconBook size={16} />
+            </span>
             <span>Documentation</span>
           </NavLink>
 
@@ -116,26 +140,18 @@ export const Sidebar: React.FC = () => {
               isActive ? 'sidebar-nav-item active' : 'sidebar-nav-item'
             }
           >
-            <span className="nav-item-icon">⚙</span>
+            <span className="nav-item-icon">
+              <IconSettings size={16} />
+            </span>
             <span>Settings</span>
           </NavLink>
         </nav>
       </div>
 
       <div className="sidebar-bottom">
-        <div
-          className="engine-status-card"
-          style={{
-            borderColor: isConnected ? 'var(--status-success-border)' : '#7f1d1d',
-          }}
-        >
+        <div className="engine-status-card">
           <div className="status-row">
-            <span
-              className="status-dot"
-              style={{
-                backgroundColor: isConnected ? 'var(--status-success)' : '#ef4444',
-              }}
-            />
+            <span className={`status-dot ${isConnected ? 'active' : 'offline'}`} />
             <span className="status-label">
               {isConnected ? `Engine Active (v${data?.version || '0.1.0'})` : 'Engine Offline'}
             </span>

@@ -5,6 +5,19 @@ import { BoardCard } from '../components/BoardCard.js';
 import { CreateBoardModal } from '../components/CreateBoardModal.js';
 import { RenameBoardModal } from '../components/RenameBoardModal.js';
 import { ConfirmDialog } from '../components/ConfirmDialog.js';
+import { SearchInput } from '../components/ui/SearchInput.js';
+import { Button } from '../components/ui/Button.js';
+import { EmptyState } from '../components/ui/EmptyState.js';
+import { BoardCardSkeleton } from '../components/ui/Skeleton.js';
+import { useToast } from '../components/ui/ToastContext.js';
+import {
+  IconPlus,
+  IconGrid,
+  IconClock,
+  IconStar,
+  IconTrash,
+  IconSearch,
+} from '../components/icons/Icons.js';
 
 type DashboardFilter = 'all' | 'recent' | 'favorites' | 'trash';
 type SortOption = 'updatedAt:desc' | 'createdAt:desc' | 'name:asc' | 'name:desc';
@@ -12,6 +25,7 @@ type SortOption = 'updatedAt:desc' | 'createdAt:desc' | 'name:asc' | 'name:desc'
 export const DashboardView: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const toast = useToast();
 
   const filter = (searchParams.get('filter') as DashboardFilter) || 'all';
   const isTrash = filter === 'trash';
@@ -44,7 +58,7 @@ export const DashboardView: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchQuery.trim());
-    }, 250);
+    }, 200);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -156,6 +170,7 @@ export const DashboardView: React.FC = () => {
 
       const json = await res.json();
       setIsCreateOpen(false);
+      toast.success('Whiteboard created', `"${name}" is ready`);
       navigate(`/board/${json.data.metadata.id}`);
     } finally {
       setIsCreating(false);
@@ -182,6 +197,7 @@ export const DashboardView: React.FC = () => {
         ),
       );
       setRenameTarget(null);
+      toast.success('Whiteboard renamed', `Updated to "${newName}"`);
     } finally {
       setIsRenaming(false);
     }
@@ -198,9 +214,10 @@ export const DashboardView: React.FC = () => {
         throw new Error(json?.error?.message || 'Failed to duplicate whiteboard');
       }
 
+      toast.success('Whiteboard duplicated');
       fetchBoards();
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to duplicate whiteboard.');
+      toast.error('Failed to duplicate', err instanceof Error ? err.message : 'Unknown error');
     }
   };
 
@@ -246,9 +263,10 @@ export const DashboardView: React.FC = () => {
       }
 
       setBoards((prev) => prev.filter((b) => b.id !== trashTarget.id));
+      toast.warning('Moved to Trash', `"${trashTarget.name}" can be restored later`);
       setTrashTarget(null);
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to delete board.');
+      toast.error('Failed to move to trash', err instanceof Error ? err.message : undefined);
     } finally {
       setIsTrashing(false);
     }
@@ -266,8 +284,9 @@ export const DashboardView: React.FC = () => {
       }
 
       setBoards((prev) => prev.filter((b) => b.id !== id));
+      toast.success('Whiteboard restored', 'Restored to active workspace');
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to restore board.');
+      toast.error('Failed to restore board', err instanceof Error ? err.message : undefined);
     }
   };
 
@@ -285,9 +304,10 @@ export const DashboardView: React.FC = () => {
       }
 
       setBoards((prev) => prev.filter((b) => b.id !== permDeleteTarget.id));
+      toast.info('Permanently deleted', `"${permDeleteTarget.name}" erased from storage`);
       setPermDeleteTarget(null);
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to delete board.');
+      toast.error('Failed to delete permanently', err instanceof Error ? err.message : undefined);
     } finally {
       setIsPermDeleting(false);
     }
@@ -303,20 +323,20 @@ export const DashboardView: React.FC = () => {
       case 'trash':
         return 'Trash';
       default:
-        return 'Whiteboard Workspaces';
+        return 'All Whiteboards';
     }
   };
 
   const getViewSubtitle = () => {
     switch (filter) {
       case 'recent':
-        return 'Recently modified whiteboard canvases and diagrams';
+        return 'Recently modified canvas diagrams and architecture layouts';
       case 'favorites':
-        return 'Pinned boards for fast access';
+        return 'Pinned whiteboards for fast, frequent access';
       case 'trash':
-        return 'Deleted whiteboards can be restored or permanently removed';
+        return 'Deleted whiteboards can be restored or permanently erased';
       default:
-        return 'Local-first canvas for developers, architecture diagrams, and AI agents';
+        return 'Local-first personal whiteboard workspace for developers and external AI agents';
     }
   };
 
@@ -330,40 +350,31 @@ export const DashboardView: React.FC = () => {
         </div>
 
         {!isTrash && (
-          <button
+          <Button
             id="btn-create-board"
-            className="btn-primary"
+            variant="primary"
+            size="md"
+            icon={<IconPlus size={15} />}
             onClick={() => setIsCreateOpen(true)}
             title="Create new whiteboard (N)"
           >
-            <span>+</span> New Whiteboard
-          </button>
+            New Whiteboard
+          </Button>
         )}
       </div>
 
       {/* Filter and Search Controls Toolbar */}
       <div className="dashboard-toolbar">
-        <div className="search-bar-wrapper">
-          <span className="search-icon">🔍</span>
-          <input
+        <div style={{ flex: 1, maxWidth: '480px' }}>
+          <SearchInput
             id="input-search-boards"
             ref={searchInputRef}
-            type="text"
-            className="search-input"
-            placeholder="Search whiteboards by name or description... (Press / to focus)"
+            placeholder="Search whiteboards by name or description... (/ to focus)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onClear={() => setSearchQuery('')}
+            shortcutHint="/"
           />
-          {searchQuery && (
-            <button
-              type="button"
-              className="search-clear-btn"
-              onClick={() => setSearchQuery('')}
-              title="Clear search"
-            >
-              ✕
-            </button>
-          )}
         </div>
 
         <div className="sort-selector-wrapper">
@@ -396,9 +407,10 @@ export const DashboardView: React.FC = () => {
 
       {/* Main Content State Rendering */}
       {loading ? (
-        <div className="dashboard-loading-state">
-          <div className="canvas-loading-spinner" />
-          <span>Loading boards...</span>
+        <div className="boards-grid">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <BoardCardSkeleton key={`skeleton-${idx}`} />
+          ))}
         </div>
       ) : boards.length > 0 ? (
         <div className="boards-grid">
@@ -421,70 +433,70 @@ export const DashboardView: React.FC = () => {
         /* Empty States */
         <div className="dashboard-empty-state">
           {debouncedQuery ? (
-            <>
-              <div className="empty-state-icon">🔍</div>
-              <h2>No whiteboards found</h2>
-              <p>No boards match your search query &ldquo;{debouncedQuery}&rdquo;</p>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setSearchQuery('')}
-                style={{ marginTop: '16px' }}
-              >
-                Clear Search
-              </button>
-            </>
+            <EmptyState
+              icon={<IconSearch size={22} />}
+              title="No matching whiteboards"
+              description={`No boards match your search query "${debouncedQuery}".`}
+              action={
+                <Button variant="secondary" size="md" onClick={() => setSearchQuery('')}>
+                  Clear Search
+                </Button>
+              }
+            />
           ) : filter === 'favorites' ? (
-            <>
-              <div className="empty-state-icon">★</div>
-              <h2>No favorite boards yet</h2>
-              <p>Click the star icon on any whiteboard card to pin it here for quick access.</p>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setSearchParams({ filter: 'all' })}
-                style={{ marginTop: '16px' }}
-              >
-                View All Boards
-              </button>
-            </>
+            <EmptyState
+              icon={<IconStar size={22} />}
+              title="No favorite whiteboards yet"
+              description="Click the star icon on any whiteboard card to bookmark it here for quick access."
+              action={
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setSearchParams({ filter: 'all' })}
+                >
+                  View All Boards
+                </Button>
+              }
+            />
           ) : filter === 'recent' ? (
-            <>
-              <div className="empty-state-icon">🕒</div>
-              <h2>No recent activity</h2>
-              <p>Whiteboards you create or edit will appear here.</p>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={() => setIsCreateOpen(true)}
-                style={{ marginTop: '16px' }}
-              >
-                <span>+</span> Create First Whiteboard
-              </button>
-            </>
+            <EmptyState
+              icon={<IconClock size={22} />}
+              title="No recent activity"
+              description="Whiteboards you create or edit will appear here automatically."
+              action={
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon={<IconPlus size={15} />}
+                  onClick={() => setIsCreateOpen(true)}
+                >
+                  Create First Whiteboard
+                </Button>
+              }
+            />
           ) : filter === 'trash' ? (
-            <>
-              <div className="empty-state-icon">🗑</div>
-              <h2>Trash is empty</h2>
-              <p>Deleted whiteboards will be stored here and can be restored at any time.</p>
-            </>
+            <EmptyState
+              icon={<IconTrash size={22} />}
+              title="Trash is empty"
+              description="Deleted whiteboards will be stored here and can be restored at any time."
+            />
           ) : (
-            <>
-              <div className="empty-state-icon">▦</div>
-              <h2>No Whiteboards Yet</h2>
-              <p>
-                Create your first whiteboard to start sketching diagrams, architecture concepts, and
-                visual workflows.
-              </p>
-              <button
-                id="btn-create-first-board"
-                className="btn-primary"
-                onClick={() => setIsCreateOpen(true)}
-                style={{ marginTop: '16px' }}
-              >
-                <span>+</span> Create First Whiteboard
-              </button>
-            </>
+            <EmptyState
+              icon={<IconGrid size={22} />}
+              title="No whiteboards yet"
+              description="Create your first whiteboard to start sketching diagrams, architecture concepts, and visual workflows."
+              action={
+                <Button
+                  id="btn-create-first-board"
+                  variant="primary"
+                  size="md"
+                  icon={<IconPlus size={15} />}
+                  onClick={() => setIsCreateOpen(true)}
+                >
+                  Create First Whiteboard
+                </Button>
+              }
+            />
           )}
         </div>
       )}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { IconClose } from './icons/Icons.js';
+import { Button } from './ui/Button.js';
 
 export interface CreateBoardModalProps {
   isOpen: boolean;
@@ -44,7 +46,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanName = name.trim() || 'Untitled Board';
+    const cleanName = name.trim() || 'Untitled Whiteboard';
     const cleanDesc = description.trim() || undefined;
     setError(null);
 
@@ -58,7 +60,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div
-        className="modal-container"
+        className="modal-container modal-size-md"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -79,7 +81,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             onClick={onClose}
             aria-label="Close dialog"
           >
-            ✕
+            <IconClose size={15} />
           </button>
         </div>
 
@@ -96,11 +98,12 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
                 ref={inputRef}
                 type="text"
                 className="form-input"
-                placeholder="e.g. SaaS Architecture, Payment Flow"
+                placeholder="e.g. Architecture Topology, API Specs"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
                 disabled={isSubmitting}
+                autoFocus
               />
             </div>
 
@@ -122,22 +125,24 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
           </div>
 
           <div className="modal-footer">
-            <button
+            <Button
               type="button"
-              className="btn-secondary"
+              variant="ghost"
+              size="md"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               id="btn-confirm-create-board"
               type="submit"
-              className="btn-primary"
-              disabled={isSubmitting}
+              variant="primary"
+              size="md"
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? 'Creating...' : 'Create & Open'}
-            </button>
+              Create Whiteboard
+            </Button>
           </div>
         </form>
       </div>

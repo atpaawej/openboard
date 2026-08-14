@@ -1,33 +1,44 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import {
+  IconTerminal,
+  IconLayers,
+  IconCpu,
+  IconSettings,
+  IconGrid,
+  IconAlertCircle,
+  IconCheck,
+  IconCopy,
+  IconSearch,
+} from '../components/icons/Icons.js';
 
 interface DocSection {
   id: string;
   title: string;
   category: 'core' | 'mcp' | 'agents';
-  icon: string;
+  icon: React.ReactNode;
 }
 
 const SECTIONS: DocSection[] = [
-  { id: 'getting-started', title: 'Getting Started', category: 'core', icon: '🚀' },
-  { id: 'architecture', title: 'System Architecture', category: 'core', icon: '🏗️' },
-  { id: 'mcp-overview', title: 'MCP Overview & Design', category: 'mcp', icon: '🔌' },
-  { id: 'mcp-tools', title: 'MCP Tools Reference', category: 'mcp', icon: '🛠️' },
+  { id: 'getting-started', title: 'Getting Started', category: 'core', icon: <IconTerminal size={15} /> },
+  { id: 'architecture', title: 'System Architecture', category: 'core', icon: <IconLayers size={15} /> },
+  { id: 'mcp-overview', title: 'MCP Overview & Design', category: 'mcp', icon: <IconCpu size={15} /> },
+  { id: 'mcp-tools', title: 'MCP Tools Reference', category: 'mcp', icon: <IconSettings size={15} /> },
   {
     id: 'visual-inspection',
-    title: 'Visual Inspection & Screenshots',
+    title: 'Visual Inspection & Vision',
     category: 'mcp',
-    icon: '👁️',
+    icon: <IconGrid size={15} />,
   },
-  { id: 'mcp-connection', title: 'Connection & Stdio Protocol', category: 'mcp', icon: '🔗' },
-  { id: 'troubleshooting', title: 'Troubleshooting & FAQs', category: 'mcp', icon: '❓' },
-  { id: 'agent-claude-code', title: 'Claude Code', category: 'agents', icon: '🟣' },
-  { id: 'agent-cursor', title: 'Cursor', category: 'agents', icon: '⚡' },
-  { id: 'agent-opencode', title: 'OpenCode', category: 'agents', icon: '🌐' },
-  { id: 'agent-codex', title: 'OpenAI Codex / Agents', category: 'agents', icon: '🤖' },
-  { id: 'agent-openclaw', title: 'OpenClaw', category: 'agents', icon: '🐾' },
-  { id: 'agent-hermes', title: 'Hermes Agent', category: 'agents', icon: '🪶' },
-  { id: 'agent-generic', title: 'Generic MCP Client', category: 'agents', icon: '📦' },
+  { id: 'mcp-connection', title: 'Connection & Stdio Protocol', category: 'mcp', icon: <IconTerminal size={15} /> },
+  { id: 'troubleshooting', title: 'Troubleshooting & FAQs', category: 'mcp', icon: <IconAlertCircle size={15} /> },
+  { id: 'agent-claude-code', title: 'Claude Code', category: 'agents', icon: <IconCpu size={15} /> },
+  { id: 'agent-cursor', title: 'Cursor IDE', category: 'agents', icon: <IconCpu size={15} /> },
+  { id: 'agent-opencode', title: 'OpenCode', category: 'agents', icon: <IconCpu size={15} /> },
+  { id: 'agent-codex', title: 'OpenAI Codex / Agents SDK', category: 'agents', icon: <IconCpu size={15} /> },
+  { id: 'agent-openclaw', title: 'OpenClaw', category: 'agents', icon: <IconCpu size={15} /> },
+  { id: 'agent-hermes', title: 'Hermes Agent', category: 'agents', icon: <IconCpu size={15} /> },
+  { id: 'agent-generic', title: 'Generic MCP Client', category: 'agents', icon: <IconTerminal size={15} /> },
 ];
 
 export const DocsView: React.FC = () => {
@@ -60,13 +71,19 @@ export const DocsView: React.FC = () => {
             <span className="docs-badge">Documentation</span>
             <span className="docs-version-pill">v0.1.0</span>
           </div>
-          <input
-            type="text"
-            className="docs-search-input"
-            placeholder="Search guides & tools..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <span style={{ position: 'absolute', left: '8px', color: 'var(--text-muted)', display: 'inline-flex' }}>
+              <IconSearch size={13} />
+            </span>
+            <input
+              type="text"
+              className="docs-search-input"
+              style={{ width: '100%', paddingLeft: '28px' }}
+              placeholder="Search guides & tools..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
 
         <nav className="docs-nav-links">
@@ -195,8 +212,19 @@ const CodeBox: React.FC<{
         className="docs-copy-btn"
         onClick={() => copy(code, copyKey)}
         title="Copy code"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
       >
-        {copiedKey === copyKey ? '✓ Copied' : 'Copy'}
+        {copiedKey === copyKey ? (
+          <>
+            <IconCheck size={12} style={{ color: 'var(--success)' }} />
+            <span style={{ color: 'var(--success)' }}>Copied</span>
+          </>
+        ) : (
+          <>
+            <IconCopy size={12} />
+            <span>Copy</span>
+          </>
+        )}
       </button>
     </div>
     <pre className="docs-code-pre">
@@ -326,9 +354,9 @@ const ArchitectureDoc: React.FC<DocProps> = () => (
                  │                     │
         HeadlessCanvasEngine        SQLite
                  │
-              tldraw
+               tldraw
                  │
-          optional browser
+           optional browser
       `}</pre>
     </div>
 
@@ -562,7 +590,7 @@ const VisualInspectionDoc: React.FC<DocProps> = ({ copy, copiedKey }) => (
   <article className="docs-article">
     <div className="docs-header">
       <span className="docs-tag">Visual Inspection</span>
-      <h1>Visual Inspection & Screenshots</h1>
+      <h1>Visual Inspection & Vision</h1>
       <p className="docs-lead">
         External multimodal AI agents can visually inspect whiteboard diagrams without needing a
         running browser or Chromium instance.

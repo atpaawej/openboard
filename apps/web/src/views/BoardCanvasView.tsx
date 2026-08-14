@@ -8,12 +8,16 @@ import {
   useBoardAutosave,
   useBoardLiveSync,
 } from '../canvas/index.js';
+import { IconArrowLeft, IconEdit, IconAlertCircle } from '../components/icons/Icons.js';
+import { Button } from '../components/ui/Button.js';
+import { useToast } from '../components/ui/ToastContext.js';
 
 type BoardViewStatus = 'loading' | 'ready' | 'not-found' | 'error' | 'corrupt-document';
 
 export const BoardCanvasView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [status, setStatus] = useState<BoardViewStatus>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -150,6 +154,7 @@ export const BoardCanvasView: React.FC = () => {
         const json = await response.json();
         setBoard((prev) => (prev ? { ...prev, metadata: json.data.metadata } : null));
         setTitleInput(json.data.metadata.name);
+        toast.success('Renamed whiteboard', `Updated to "${trimmed}"`);
       } else {
         setTitleInput(board.metadata.name);
       }
@@ -174,7 +179,7 @@ export const BoardCanvasView: React.FC = () => {
     return (
       <div className="canvas-view canvas-loading-view">
         <div className="canvas-loading-spinner" />
-        <p style={{ color: 'var(--text-secondary)', marginTop: '16px', fontSize: '0.95rem' }}>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '16px', fontSize: '0.85rem' }}>
           Loading whiteboard...
         </p>
       </div>
@@ -186,17 +191,24 @@ export const BoardCanvasView: React.FC = () => {
     return (
       <div className="canvas-view canvas-message-view">
         <div className="canvas-placeholder-card">
-          <h2 style={{ color: 'var(--text-primary)' }}>Whiteboard Not Found</h2>
-          <p>
-            The requested board <code>{id}</code> does not exist in local SQLite storage.
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--warning)', marginBottom: '8px' }}>
+            <IconAlertCircle size={32} />
+          </div>
+          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 600 }}>Whiteboard Not Found</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem' }}>
+            The requested whiteboard <code>{id}</code> does not exist in local SQLite storage.
           </p>
-          <button
-            id="btn-return-dashboard"
-            className="btn-primary"
-            onClick={() => navigate('/dashboard')}
-          >
-            ← Return to Dashboard
-          </button>
+          <div style={{ marginTop: '12px' }}>
+            <Button
+              id="btn-return-dashboard"
+              variant="primary"
+              size="md"
+              icon={<IconArrowLeft size={15} />}
+              onClick={() => navigate('/dashboard')}
+            >
+              Return to Dashboard
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -206,40 +218,42 @@ export const BoardCanvasView: React.FC = () => {
   if (status === 'corrupt-document') {
     return (
       <div className="canvas-view canvas-message-view">
-        <div className="canvas-placeholder-card" style={{ borderColor: '#ef4444' }}>
-          <h2 style={{ color: '#ef4444' }}>Document Data Error</h2>
-          <p>
+        <div className="canvas-placeholder-card" style={{ borderColor: 'var(--danger-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)', marginBottom: '8px' }}>
+            <IconAlertCircle size={32} />
+          </div>
+          <h2 style={{ color: 'var(--danger)', fontSize: '1.2rem', fontWeight: 600 }}>Document Data Error</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem' }}>
             The stored whiteboard document for <strong>{board?.metadata.name || id}</strong> could
             not be loaded safely:
           </p>
           <div
             style={{
               padding: '10px 14px',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
+              backgroundColor: 'var(--danger-subtle)',
+              border: '1px solid var(--danger-border)',
               borderRadius: 'var(--radius-sm)',
               color: '#f87171',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontFamily: 'var(--font-mono)',
-              marginBottom: '20px',
               textAlign: 'left',
               wordBreak: 'break-word',
             }}
           >
             {errorMessage}
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             Your original stored data in SQLite has been preserved and was not overwritten.
           </p>
           <div
-            style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}
+            style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '12px' }}
           >
-            <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
-              ← Return to Dashboard
-            </button>
-            <button className="btn-primary" onClick={loadBoard}>
+            <Button variant="secondary" size="md" onClick={() => navigate('/dashboard')}>
+              Return to Dashboard
+            </Button>
+            <Button variant="primary" size="md" onClick={loadBoard}>
               Retry Loading
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -250,18 +264,23 @@ export const BoardCanvasView: React.FC = () => {
   if (status === 'error') {
     return (
       <div className="canvas-view canvas-message-view">
-        <div className="canvas-placeholder-card" style={{ borderColor: '#ef4444' }}>
-          <h2 style={{ color: '#ef4444' }}>Connection Error</h2>
-          <p>{errorMessage || 'Failed to communicate with OpenBoard server.'}</p>
+        <div className="canvas-placeholder-card" style={{ borderColor: 'var(--danger-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)', marginBottom: '8px' }}>
+            <IconAlertCircle size={32} />
+          </div>
+          <h2 style={{ color: 'var(--danger)', fontSize: '1.2rem', fontWeight: 600 }}>Connection Error</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem' }}>
+            {errorMessage || 'Failed to communicate with OpenBoard server.'}
+          </p>
           <div
-            style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}
+            style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '12px' }}
           >
-            <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
-              ← Return to Dashboard
-            </button>
-            <button className="btn-primary" onClick={loadBoard}>
+            <Button variant="secondary" size="md" onClick={() => navigate('/dashboard')}>
+              Return to Dashboard
+            </Button>
+            <Button variant="primary" size="md" onClick={loadBoard}>
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -275,11 +294,12 @@ export const BoardCanvasView: React.FC = () => {
         <div className="canvas-toolbar-left">
           <button
             id="btn-back-dashboard"
-            className="btn-secondary btn-back-dashboard"
+            className="btn-back-dashboard"
             onClick={handleBackToDashboard}
             title="Return to Dashboard (saves pending changes)"
           >
-            ← Boards
+            <IconArrowLeft size={14} />
+            <span>Boards</span>
           </button>
 
           <div className="canvas-title-wrapper">
@@ -300,9 +320,10 @@ export const BoardCanvasView: React.FC = () => {
                 id="display-board-title"
                 className="canvas-title-display"
                 onClick={() => setIsEditingTitle(true)}
-                title="Click to rename board"
+                title="Click to rename whiteboard"
               >
                 {board?.metadata.name || 'Untitled Whiteboard'}
+                <IconEdit size={12} style={{ marginLeft: '6px', opacity: 0.6 }} />
               </span>
             )}
           </div>
@@ -330,17 +351,17 @@ export const BoardCanvasView: React.FC = () => {
             {saveStatus === 'unsaved' && (
               <>
                 <span className="save-status-dot dot-unsaved" />
-                <span>Unsaved changes</span>
+                <span>Unsaved</span>
               </>
             )}
             {saveStatus === 'error' && (
               <>
                 <span className="save-status-dot dot-error" />
-                <span style={{ color: '#ef4444' }}>Save failed</span>
+                <span style={{ color: 'var(--danger)' }}>Save failed</span>
                 <button
                   className="btn-retry-save"
                   onClick={() => saveNow()}
-                  style={{ marginLeft: '6px', fontSize: '0.75rem', textDecoration: 'underline' }}
+                  style={{ marginLeft: '6px', fontSize: '0.72rem', textDecoration: 'underline', color: 'var(--danger)' }}
                 >
                   Retry
                 </button>

@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { IconClose, IconAlertCircle } from './icons/Icons.js';
+import { Button } from './ui/Button.js';
 
 export interface ConfirmDialogProps {
   isOpen: boolean;
@@ -36,21 +38,21 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   if (!isOpen) return null;
 
-  const getConfirmButtonClass = () => {
+  const getConfirmButtonVariant = () => {
     switch (variant) {
       case 'danger':
-        return 'btn-danger';
+        return 'danger';
       case 'warning':
-        return 'btn-warning';
+        return 'warning';
       default:
-        return 'btn-primary';
+        return 'primary';
     }
   };
 
   return (
     <div className="modal-backdrop" onClick={onCancel}>
       <div
-        className="modal-container modal-dialog-confirm"
+        className="modal-container modal-size-sm"
         onClick={(e) => e.stopPropagation()}
         role="alertdialog"
         aria-modal="true"
@@ -58,16 +60,23 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         aria-describedby="dialog-confirm-desc"
       >
         <div className="modal-header">
-          <h2 id="dialog-confirm-title" className="modal-title">
-            {title}
-          </h2>
+          <div className="modal-title-group" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+            {variant === 'danger' || variant === 'warning' ? (
+              <span style={{ color: variant === 'danger' ? 'var(--danger)' : 'var(--warning)', display: 'inline-flex' }}>
+                <IconAlertCircle size={18} />
+              </span>
+            ) : null}
+            <h2 id="dialog-confirm-title" className="modal-title">
+              {title}
+            </h2>
+          </div>
           <button
             type="button"
             className="modal-close-btn"
             onClick={onCancel}
             aria-label="Close dialog"
           >
-            ✕
+            <IconClose size={15} />
           </button>
         </div>
 
@@ -78,23 +87,25 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
 
         <div className="modal-footer">
-          <button
+          <Button
             type="button"
-            className="btn-secondary"
+            variant="ghost"
+            size="md"
             onClick={onCancel}
             disabled={isSubmitting}
           >
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
             id="btn-dialog-confirm-action"
             type="button"
-            className={getConfirmButtonClass()}
+            variant={getConfirmButtonVariant()}
+            size="md"
             onClick={() => onConfirm()}
-            disabled={isSubmitting}
+            isLoading={isSubmitting}
           >
-            {isSubmitting ? 'Processing...' : confirmLabel}
-          </button>
+            {confirmLabel}
+          </Button>
         </div>
       </div>
     </div>

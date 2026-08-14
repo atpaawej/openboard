@@ -5,6 +5,28 @@ All notable changes to OpenBoard are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-08-14
+
+### Production UI/UX Overhaul & Refinements
+
+- **Twenty UI Inspired Dark Design System**
+  - Implemented pure neutral near-black surfaces (`--bg-app: #0e0e11`, `--bg-sidebar: #121215`, `--bg-surface: #17171c`, `--bg-card: #141418`) with zero blue tint.
+  - Added electric modern blue accents (`--accent: #2563eb`) with subtle elevation shadows for primary actions.
+  - Centralized semantic tokens for colors, spacing, typography, radii, shadows, and z-index layers.
+  - Created zero-dependency SVG iconography system (`Icons.tsx`) eliminating all emojis and unicode placeholders.
+
+- **Reusable Component Architecture & UX Improvements**
+  - Created reusable UI primitives: `Button`, `IconButton`, `Input`, `SearchInput`, `Modal`, `DropdownMenu`, `Toast`, `Skeleton`, `EmptyState`, and `Badge`.
+  - Added non-intrusive floating toast notifications for board actions (create, duplicate, trash, restore, rename).
+  - Added keyboard productivity shortcuts: `N` (New Whiteboard), `/` (Focus Search), `Esc` (Clear search / dismiss modal), `Enter` (Confirm / submit).
+  - Added skeleton loading placeholders and tailored empty states for All, Recent, Favorites, and Trash views.
+  - Refined Board Editor Chrome with minimal toolbar, inline editable title, and calm save status indicators.
+  - Redesigned Settings and Documentation Center with 13-tool filterable catalog and 1-click code copying.
+
+- **Context Menu Clipping Fix**
+  - Fixed thumbnail overflow clipping that previously hid the bottom context menu actions ("Move to Trash" / "Delete Permanently").
+  - Isolated thumbnail image cropping while elevating active menu cards to `z-index: 50` so dropdowns float unobstructed over sibling cards.
+
 ---
 
 ## [0.1.2] - 2026-08-14

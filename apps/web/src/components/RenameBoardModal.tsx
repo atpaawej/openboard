@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { IconClose } from './icons/Icons.js';
+import { Button } from './ui/Button.js';
 
 export interface RenameBoardModalProps {
   isOpen: boolean;
@@ -67,7 +69,7 @@ export const RenameBoardModal: React.FC<RenameBoardModalProps> = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div
-        className="modal-container"
+        className="modal-container modal-size-md"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -86,7 +88,7 @@ export const RenameBoardModal: React.FC<RenameBoardModalProps> = ({
             onClick={onClose}
             aria-label="Close dialog"
           >
-            ✕
+            <IconClose size={15} />
           </button>
         </div>
 
@@ -113,22 +115,25 @@ export const RenameBoardModal: React.FC<RenameBoardModalProps> = ({
           </div>
 
           <div className="modal-footer">
-            <button
+            <Button
               type="button"
-              className="btn-secondary"
+              variant="ghost"
+              size="md"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               id="btn-confirm-rename-board"
               type="submit"
-              className="btn-primary"
+              variant="primary"
+              size="md"
               disabled={isSubmitting || !name.trim()}
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? 'Renaming...' : 'Save'}
-            </button>
+              Save Changes
+            </Button>
           </div>
         </form>
       </div>

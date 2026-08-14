@@ -1,5 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { BoardSummary } from '@openboard/shared';
+import {
+  IconStar,
+  IconStarFilled,
+  IconMoreHorizontal,
+  IconExternalLink,
+  IconEdit,
+  IconCopy,
+  IconTrash,
+  IconRestore,
+  IconClose,
+  IconGrid,
+} from './icons/Icons.js';
 
 export interface BoardCardProps {
   board: BoardSummary;
@@ -97,7 +109,8 @@ export const BoardCard: React.FC<BoardCardProps> = ({
   const handleCardClick = (e: React.MouseEvent) => {
     if (
       (e.target as HTMLElement).closest('.card-action-btn') ||
-      (e.target as HTMLElement).closest('.card-context-menu')
+      (e.target as HTMLElement).closest('.card-context-menu') ||
+      (e.target as HTMLElement).closest('.btn-trash-quick-restore')
     ) {
       return;
     }
@@ -119,24 +132,35 @@ export const BoardCard: React.FC<BoardCardProps> = ({
   return (
     <div
       id={`board-card-${board.id}`}
-      className={`board-card ${isTrash ? 'board-card-trash' : ''}`}
+      className={`board-card ${isTrash ? 'board-card-trash' : ''} ${menuOpen ? 'is-menu-open' : ''}`}
       onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !isTrash) {
+          onOpen(board.id);
+        }
+      }}
     >
-      {/* Thumbnail area */}
+      {/* Thumbnail Area with inner clipping to prevent menu cutoff */}
       <div className="board-card-thumbnail-wrapper">
-        {board.thumbnail ? (
-          <img
-            src={board.thumbnail}
-            alt={`${board.name} preview`}
-            className="board-card-thumbnail-img"
-            loading="lazy"
-          />
-        ) : (
-          <div className="board-card-thumbnail-placeholder">
-            <div className="thumbnail-grid-lines" />
-            <span className="thumbnail-placeholder-icon">▦</span>
-          </div>
-        )}
+        <div className="board-card-thumbnail-inner">
+          {board.thumbnail ? (
+            <img
+              src={board.thumbnail}
+              alt={`${board.name} preview`}
+              className="board-card-thumbnail-img"
+              loading="lazy"
+            />
+          ) : (
+            <div className="board-card-thumbnail-placeholder">
+              <div className="thumbnail-grid-lines" />
+              <span className="thumbnail-placeholder-icon">
+                <IconGrid size={24} />
+              </span>
+            </div>
+          )}
+        </div>
 
         {!isTrash && (
           <button
@@ -146,7 +170,7 @@ export const BoardCard: React.FC<BoardCardProps> = ({
             title={board.favorite ? 'Remove from Favorites' : 'Mark as Favorite'}
             aria-label={board.favorite ? 'Remove from Favorites' : 'Mark as Favorite'}
           >
-            ★
+            {board.favorite ? <IconStarFilled size={14} /> : <IconStar size={14} />}
           </button>
         )}
 
@@ -154,13 +178,13 @@ export const BoardCard: React.FC<BoardCardProps> = ({
           <button
             ref={menuBtnRef}
             type="button"
-            className="card-action-btn card-more-btn"
+            className={`card-action-btn card-more-btn ${menuOpen ? 'is-active' : ''}`}
             onClick={handleMenuToggle}
             title="Board actions"
             aria-label="Board options"
             aria-expanded={menuOpen}
           >
-            •••
+            <IconMoreHorizontal size={14} />
           </button>
 
           {menuOpen && (
@@ -177,7 +201,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onOpen(board.id);
                     }}
                   >
-                    <span className="menu-icon">↗</span>
+                    <span className="menu-icon">
+                      <IconExternalLink size={14} />
+                    </span>
                     <span>Open Whiteboard</span>
                   </button>
                   <button
@@ -190,7 +216,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onRename(board);
                     }}
                   >
-                    <span className="menu-icon">✎</span>
+                    <span className="menu-icon">
+                      <IconEdit size={14} />
+                    </span>
                     <span>Rename</span>
                   </button>
                   <button
@@ -203,7 +231,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onDuplicate(board.id);
                     }}
                   >
-                    <span className="menu-icon">⎘</span>
+                    <span className="menu-icon">
+                      <IconCopy size={14} />
+                    </span>
                     <span>Duplicate</span>
                   </button>
                   <button
@@ -216,7 +246,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onToggleFavorite(board.id);
                     }}
                   >
-                    <span className="menu-icon">★</span>
+                    <span className="menu-icon">
+                      {board.favorite ? <IconStar size={14} /> : <IconStarFilled size={14} />}
+                    </span>
                     <span>{board.favorite ? 'Unfavorite' : 'Favorite'}</span>
                   </button>
                   <div className="menu-divider" />
@@ -230,7 +262,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onDelete(board);
                     }}
                   >
-                    <span className="menu-icon">🗑</span>
+                    <span className="menu-icon">
+                      <IconTrash size={14} />
+                    </span>
                     <span>Move to Trash</span>
                   </button>
                 </>
@@ -246,7 +280,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onRestore?.(board.id);
                     }}
                   >
-                    <span className="menu-icon">↺</span>
+                    <span className="menu-icon">
+                      <IconRestore size={14} />
+                    </span>
                     <span>Restore Board</span>
                   </button>
                   <div className="menu-divider" />
@@ -260,7 +296,9 @@ export const BoardCard: React.FC<BoardCardProps> = ({
                       onPermanentDelete?.(board);
                     }}
                   >
-                    <span className="menu-icon">✕</span>
+                    <span className="menu-icon">
+                      <IconClose size={14} />
+                    </span>
                     <span>Delete Permanently</span>
                   </button>
                 </>
