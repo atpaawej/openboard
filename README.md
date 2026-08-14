@@ -1,10 +1,16 @@
 # OpenBoard
 
-Local-first whiteboard for humans and AI agents.
+Local-first personal whiteboard workspace for developers and external AI agents.
 
 ```bash
-npm install -g open-board
+# Install globally from npm
+npm install -g openboard-app
+
+# Launch the workspace server & dashboard
 openboard start
+
+# Or run directly without installing
+npx openboard-app start
 ```
 
 OpenBoard runs entirely on your local machine. Whiteboards and canvas metadata are stored in your local SQLite database at:
@@ -17,7 +23,7 @@ OpenBoard runs entirely on your local machine. Whiteboards and canvas metadata a
 
 ## ✦ Connect Your AI Agent via MCP
 
-OpenBoard includes a native Model Context Protocol (MCP) server over `stdio` for external AI agents.
+OpenBoard includes a native Model Context Protocol (MCP) server over `stdio` for external AI coding agents.
 
 ### Generic MCP stdio Configuration
 
@@ -46,12 +52,14 @@ openboard mcp
 
 OpenBoard is a lightweight, local-first infinite whiteboard pairing an interactive **tldraw** canvas with an **MCP stdio server**. It allows developers and autonomous AI coding agents (Claude Code, Cursor, OpenCode, Codex, OpenClaw, Hermes) to create, inspect, and update software architecture diagrams, workflows, and visual notes collaboratively.
 
-### Why OpenBoard?
+### Key Features
 
-- **Local-First & Private:** All data resides in a local SQLite file (`~/.openboard/openboard.db`). Zero telemetry, zero cloud lock-in, zero external API dependencies.
+- **Local-First & 100% Private:** All data resides in a local SQLite file (`~/.openboard/openboard.db`). Zero telemetry, zero cloud lock-in, zero external API dependencies.
+- **Twenty-Inspired Dark UI:** Deep neutral near-black surfaces (`#0e0e11`), vibrant electric blue accents (`#2563eb`), refined typography, and purposeful micro-animations.
 - **AI Agent Native:** Autonomous coding agents can discover, create, update, and organize whiteboards using 13 high-level semantic tools.
 - **Headless Canvas Inspection:** Agents can inspect semantic canvas structures and render vector SVG screenshots without a browser or GUI environment.
 - **Live SSE Projection:** When a human has a board open in their browser, agent modifications stream seamlessly in real time via Server-Sent Events (SSE).
+- **Keyboard-Driven Workflow:** Press `N` to create a whiteboard, `/` to focus search, `Esc` to clear/dismiss, and `Enter` to confirm.
 - **Browser Optional for Agents:** AI agents can manipulate boards whether the web UI is open or closed.
 
 ---
@@ -129,6 +137,17 @@ OpenBoard exposes 13 semantic tools to connected agents:
 11. `create_shapes`: Create shapes (geo rectangles, ellipses, notes, text, frames, arrows).
 12. `update_shapes`: Modify shape positions, dimensions, text, colors, or arrow connections.
 13. `delete_shapes`: Remove shapes and automatically clean attached bindings.
+
+---
+
+## ✦ Keyboard Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| <kbd>N</kbd> | Open New Whiteboard modal |
+| <kbd>/</kbd> | Focus dashboard search bar |
+| <kbd>Esc</kbd> | Clear search input / Dismiss modal or context menu |
+| <kbd>Enter</kbd> | Submit modal form / Open selected board |
 
 ---
 
