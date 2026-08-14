@@ -55,6 +55,23 @@ export class TldrawDocumentAdapter {
         if (!rec['meta'] || typeof rec['meta'] !== 'object') {
           rec['meta'] = {};
         }
+        if (rec['typeName'] === 'shape') {
+          const type = rec['type'] || 'geo';
+          const props = rec['props'];
+          if (props && typeof props === 'object') {
+            const cleanProps = { ...(props as Record<string, unknown>) };
+            if (type === 'text') {
+              delete cleanProps['h'];
+              if (cleanProps['w'] !== undefined && cleanProps['w'] !== 8) {
+                cleanProps['autoSize'] = false;
+              }
+            } else if (type === 'note' || type === 'arrow' || type === 'line' || type === 'draw') {
+              delete cleanProps['w'];
+              delete cleanProps['h'];
+            }
+            rec['props'] = cleanProps;
+          }
+        }
         normalized[key] = rec;
       }
     }

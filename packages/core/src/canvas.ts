@@ -131,7 +131,13 @@ export class HeadlessCanvasEngine {
             props.richText = toRichText(props.text);
             delete props.text;
           }
-          if (type === 'note') {
+          if (type === 'text') {
+            delete props.h;
+            if (props.w !== undefined && props.w !== 8) {
+              props.autoSize = false;
+            }
+          }
+          if (type === 'note' || type === 'arrow' || type === 'line' || type === 'draw') {
             delete props.w;
             delete props.h;
           }
@@ -210,6 +216,23 @@ export class HeadlessCanvasEngine {
         if (endBinding?.toId) toShapeId = String(endBinding.toId);
       }
 
+      let summaryW = props.w;
+      let summaryH = props.h;
+      if (type === 'text') {
+        summaryW = props.w;
+        if (text) {
+          const lines = text.split('\n');
+          summaryH = lines.length * 24;
+          if (props.autoSize || !props.w || props.w === 8) {
+            const maxLineLen = Math.max(...lines.map((l) => l.length), 1);
+            summaryW = Math.max(summaryW ?? 0, maxLineLen * 10);
+          }
+        }
+      } else if (type === 'note') {
+        summaryW = props.w ?? 200;
+        summaryH = props.h ?? 200;
+      }
+
       const summary: CanvasElementSummary = {
         id: shape.id,
         type,
@@ -223,8 +246,8 @@ export class HeadlessCanvasEngine {
         color: props.color,
         fill: props.fill,
         geo: props.geo,
-        w: props.w,
-        h: props.h,
+        w: summaryW,
+        h: summaryH,
         start: props.start ? { x: props.start.x, y: props.start.y } : undefined,
         end: props.end ? { x: props.end.x, y: props.end.y } : undefined,
         name: type === 'frame' ? props.name : undefined,
@@ -396,11 +419,24 @@ export class CanvasService {
         ...(input.props || {}),
       };
 
-      if (input.w !== undefined) props.w = Number(input.w);
-      if (input.h !== undefined) props.h = Number(input.h);
-      if (input.geo !== undefined) props.geo = String(input.geo);
+      if (input.w !== undefined) {
+        if (type === 'geo' || type === 'frame') {
+          props.w = Number(input.w);
+        } else if (type === 'text') {
+          props.w = Number(input.w);
+          props.autoSize = false;
+        }
+      }
+      if (input.h !== undefined) {
+        if (type === 'geo' || type === 'frame') {
+          props.h = Number(input.h);
+        }
+      }
+      if (input.geo !== undefined && type === 'geo') props.geo = String(input.geo);
       if (input.color !== undefined) props.color = String(input.color);
-      if (input.fill !== undefined) props.fill = String(input.fill);
+      if (input.fill !== undefined && (type === 'geo' || type === 'arrow' || type === 'draw')) {
+        props.fill = String(input.fill);
+      }
 
       if (input.text !== undefined) {
         if (type === 'geo' || type === 'text' || type === 'note') {
@@ -539,11 +575,24 @@ export class CanvasService {
       const type = existing.type || 'geo';
       const updatedProps = { ...existing.props, ...(update.props || {}) };
 
-      if (update.w !== undefined) updatedProps.w = Number(update.w);
-      if (update.h !== undefined) updatedProps.h = Number(update.h);
-      if (update.geo !== undefined) updatedProps.geo = String(update.geo);
+      if (update.w !== undefined) {
+        if (type === 'geo' || type === 'frame') {
+          updatedProps.w = Number(update.w);
+        } else if (type === 'text') {
+          updatedProps.w = Number(update.w);
+          updatedProps.autoSize = false;
+        }
+      }
+      if (update.h !== undefined) {
+        if (type === 'geo' || type === 'frame') {
+          updatedProps.h = Number(update.h);
+        }
+      }
+      if (update.geo !== undefined && type === 'geo') updatedProps.geo = String(update.geo);
       if (update.color !== undefined) updatedProps.color = String(update.color);
-      if (update.fill !== undefined) updatedProps.fill = String(update.fill);
+      if (update.fill !== undefined && (type === 'geo' || type === 'arrow' || type === 'draw')) {
+        updatedProps.fill = String(update.fill);
+      }
 
       if (update.text !== undefined) {
         if (type === 'geo' || type === 'text' || type === 'note') {
@@ -571,40 +620,54 @@ export class CanvasService {
       // Handle arrow bindings update
       if (type === 'arrow') {
         if (update.from !== undefined) {
-          const fromShapeId = normalizeShapeId(update.from);
-          bindingUpdates.push({
-            id: `binding:${shapeId}_start`,
-            typeName: 'binding',
-            type: 'arrow',
-            fromId: shapeId,
-            toId: fromShapeId,
-            props: {
-              terminal: 'start',
-              isExact: false,
-              normalizedAnchor: { x: 0.5, y: 0.5 },
-              isPrecise: false,
-              snap: 'center',
-            },
-            meta: {},
-          });
+          if (update.from) {
+            const fromShapeId = normalizeShapeId(update.from);
+            bindingUpdates.push({
+              id: `binding:${shapeId}_start`,
+              typeName: 'binding',
+              type: 'arrow',
+              fromId: shapeId,
+              toId: fromShapeId,
+              props: {
+                terminal: 'start',
+                isExact: false,
+                normalizedAnchor: { x: 0.5, y: 0.5 },
+                isPrecise: false,
+                snap: 'center',
+              },
+              meta: {},
+            });
+          } else {
+            const existingStart = store.get(`binding:${shapeId}_start` as any);
+            if (existingStart) {
+              store.remove([`binding:${shapeId}_start` as any]);
+            }
+          }
         }
         if (update.to !== undefined) {
-          const toShapeId = normalizeShapeId(update.to);
-          bindingUpdates.push({
-            id: `binding:${shapeId}_end`,
-            typeName: 'binding',
-            type: 'arrow',
-            fromId: shapeId,
-            toId: toShapeId,
-            props: {
-              terminal: 'end',
-              isExact: false,
-              normalizedAnchor: { x: 0.5, y: 0.5 },
-              isPrecise: false,
-              snap: 'center',
-            },
-            meta: {},
-          });
+          if (update.to) {
+            const toShapeId = normalizeShapeId(update.to);
+            bindingUpdates.push({
+              id: `binding:${shapeId}_end`,
+              typeName: 'binding',
+              type: 'arrow',
+              fromId: shapeId,
+              toId: toShapeId,
+              props: {
+                terminal: 'end',
+                isExact: false,
+                normalizedAnchor: { x: 0.5, y: 0.5 },
+                isPrecise: false,
+                snap: 'center',
+              },
+              meta: {},
+            });
+          } else {
+            const existingEnd = store.get(`binding:${shapeId}_end` as any);
+            if (existingEnd) {
+              store.remove([`binding:${shapeId}_end` as any]);
+            }
+          }
         }
       }
 

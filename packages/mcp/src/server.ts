@@ -299,8 +299,15 @@ export class OpenBoardMcpServer {
                   },
                   x: { type: 'number', description: 'X position on canvas' },
                   y: { type: 'number', description: 'Y position on canvas' },
-                  w: { type: 'number', description: 'Width of shape (for geo, frame, note)' },
-                  h: { type: 'number', description: 'Height of shape (for geo, frame, note)' },
+                  w: {
+                    type: 'number',
+                    description: 'Width of shape in pixels (for geo, frame, and text shapes)',
+                  },
+                  h: {
+                    type: 'number',
+                    description:
+                      'Height of shape in pixels (for geo and frame shapes; text and note shapes auto-size height)',
+                  },
                   geo: {
                     type: 'string',
                     description:
@@ -375,8 +382,15 @@ export class OpenBoardMcpServer {
                   },
                   x: { type: 'number', description: 'New X position' },
                   y: { type: 'number', description: 'New Y position' },
-                  w: { type: 'number', description: 'New width' },
-                  h: { type: 'number', description: 'New height' },
+                  w: {
+                    type: 'number',
+                    description: 'New width (for geo, frame, and text shapes)',
+                  },
+                  h: {
+                    type: 'number',
+                    description:
+                      'New height (for geo and frame shapes; text and note shapes auto-size height)',
+                  },
                   text: { type: 'string', description: 'Updated text content' },
                   color: { type: 'string', description: 'Updated color theme' },
                   fill: {

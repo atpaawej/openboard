@@ -203,3 +203,114 @@ test('CanvasService - unbound arrow creation, updating and accurate bounds compu
 
   repository.close();
 });
+
+test('CanvasService - Issue #2: update_shapes modifies arrow start/end handles and unbinds cleanly', async () => {
+  const repository = new SQLiteBoardRepository({ dbPath: ':memory:' });
+  const boardService = new BoardService(repository);
+  const canvasService = new CanvasService(boardService);
+
+  const board = await boardService.createBoard({ name: 'Arrow Binding Board' });
+  const boardId = board.metadata.id;
+
+  // 1. Create two boxes and a connected arrow
+  await canvasService.createShapes(boardId, [
+    { id: 'box_a', type: 'geo', x: 100, y: 100, w: 100, h: 80, text: 'A' },
+    { id: 'box_b', type: 'geo', x: 300, y: 100, w: 100, h: 80, text: 'B' },
+    {
+      id: 'conn_1',
+      type: 'arrow',
+      x: 100,
+      y: 100,
+      from: 'box_a',
+      to: 'box_b',
+      text: 'Original Link',
+    },
+  ]);
+
+  const state1 = await canvasService.getCanvasState(boardId);
+  const arrow1 = state1.shapes.find((s) => s.id === 'shape:conn_1')!;
+  assert.equal(arrow1.from, 'shape:box_a');
+  assert.equal(arrow1.to, 'shape:box_b');
+
+  // 2. Call update_shapes with new start/end handle points and unbind
+  await canvasService.updateShapes(boardId, [
+    {
+      id: 'conn_1',
+      start: { x: 50, y: 40 },
+      end: { x: 250, y: 40 },
+      from: '',
+      to: '',
+      text: 'Detached Offset Link',
+    },
+  ]);
+
+  const state2 = await canvasService.getCanvasState(boardId);
+  const updatedArrow = state2.shapes.find((s) => s.id === 'shape:conn_1')!;
+  assert.equal(updatedArrow.from, undefined, 'Arrow should no longer have start binding');
+  assert.equal(updatedArrow.to, undefined, 'Arrow should no longer have end binding');
+  assert.deepEqual(updatedArrow.start, { x: 50, y: 40 });
+  assert.deepEqual(updatedArrow.end, { x: 250, y: 40 });
+  assert.equal(updatedArrow.text, 'Detached Offset Link');
+
+  repository.close();
+});
+
+test('CanvasService - Issue #3: text shape accepts w and h props gracefully without throwing unexpected property errors', async () => {
+  const repository = new SQLiteBoardRepository({ dbPath: ':memory:' });
+  const boardService = new BoardService(repository);
+  const canvasService = new CanvasService(boardService);
+
+  const board = await boardService.createBoard({ name: 'Text Shape Board' });
+  const boardId = board.metadata.id;
+
+  // 1. Create text shape with explicit w and h (Repro from Issue #3)
+  const createResult = await canvasService.createShapes(boardId, [
+    {
+      id: 'title_text',
+      type: 'text',
+      x: 50,
+      y: 50,
+      w: 300,
+      h: 60,
+      text: 'Title of Architecture',
+      color: 'blue',
+    },
+    {
+      id: 'auto_text',
+      type: 'text',
+      x: 50,
+      y: 150,
+      text: 'Short Label',
+    },
+  ]);
+
+  assert.equal(createResult.createdCount, 2);
+
+  const state = await canvasService.getCanvasState(boardId);
+  const titleShape = state.shapes.find((s) => s.id === 'shape:title_text')!;
+  assert.equal(titleShape.text, 'Title of Architecture');
+  assert.equal(titleShape.w, 300);
+  assert.ok(titleShape.h !== undefined && titleShape.h >= 24, 'Height should be reported reasonably');
+
+  const autoShape = state.shapes.find((s) => s.id === 'shape:auto_text')!;
+  assert.equal(autoShape.text, 'Short Label');
+  assert.ok(autoShape.w !== undefined && autoShape.w >= 32, 'Width should not report tiny auto 8 value');
+
+  // 2. Update text shape with new w and h
+  const updateResult = await canvasService.updateShapes(boardId, [
+    {
+      id: 'title_text',
+      w: 400,
+      h: 80,
+      text: 'Updated Title of Architecture',
+    },
+  ]);
+
+  assert.equal(updateResult.updatedCount, 1);
+  const stateAfterUpdate = await canvasService.getCanvasState(boardId);
+  const updatedTitle = stateAfterUpdate.shapes.find((s) => s.id === 'shape:title_text')!;
+  assert.equal(updatedTitle.w, 400);
+  assert.equal(updatedTitle.text, 'Updated Title of Architecture');
+
+  repository.close();
+});
