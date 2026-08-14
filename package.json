@@ -1,14 +1,33 @@
 {
   "name": "openboard-monorepo",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "private": true,
   "description": "OpenBoard — Local-first personal whiteboard workspace for developers and AI agents",
-  "author": "OpenBoard Contributors",
+  "homepage": "https://github.com/atpaawej/openboard#readme",
+  "author": "Aawej & OpenBoard Contributors",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atpaawej/openboard.git"
+    "url": "git+https://github.com/atpaawej/openboard.git"
   },
+  "bugs": {
+    "url": "https://github.com/atpaawej/openboard/issues"
+  },
+  "keywords": [
+    "whiteboard",
+    "tldraw",
+    "mcp",
+    "model-context-protocol",
+    "ai-agents",
+    "local-first",
+    "diagrams",
+    "canvas",
+    "architecture",
+    "claude-code",
+    "cursor",
+    "opencode",
+    "codex"
+  ],
   "type": "module",
   "workspaces": [
     "apps/*",
@@ -34,8 +53,5 @@
     "eslint": "^9.20.1",
     "prettier": "^3.5.1",
     "typescript": "^5.7.3"
-  },
-  "dependencies": {
-    "@aawejpathan/openboard": "^0.1.0"
   }
 }
