@@ -1,6 +1,6 @@
 import { createOpenBoardServer } from './server.js';
 
-const PORT = parseInt(process.env['PORT'] || '3000', 10);
+const PORT = parseInt(process.env['PORT'] || '4747', 10);
 const HOST = process.env['HOST'] || 'localhost';
 
 async function bootstrap() {

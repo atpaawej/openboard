@@ -44,13 +44,13 @@ To start the local workspace and open the web dashboard in your default browser:
 openboard start
 ```
 
-By default, the server binds strictly to `http://localhost:3000`.
+By default, the server binds strictly to `http://localhost:4747`.
 
 ### Options:
 
 | Flag                  | Description                       | Default                     |
 | :-------------------- | :-------------------------------- | :-------------------------- |
-| `-p, --port <number>` | Port to listen on                 | `3000`                      |
+| `-p, --port <number>` | Port to listen on                 | `4747`                      |
 | `-h, --host <host>`   | Host address to bind to           | `localhost`                 |
 | `--db <path>`         | Custom SQLite database file path  | `~/.openboard/openboard.db` |
 | `--no-open`           | Do not automatically open browser | `false`                     |
@@ -129,9 +129,9 @@ sqlite3 ~/.openboard/openboard.db "SELECT id, name, updated_at FROM boards;"
 
 ## 5. Web Dashboard Navigation
 
-Open `http://localhost:3000` to access:
+Open `http://localhost:4747` to access:
 
 - **All Boards:** View active boards in grid or table view.
 - **Favorites:** Quick access to bookmarked boards.
 - **Trash:** Soft-deleted boards with instant restore or permanent deletion.
-- **Documentation Center:** Built-in interactive guides, MCP tool schemas, and integration tutorials at `http://localhost:3000/docs`.
+- **Documentation Center:** Built-in interactive guides, MCP tool schemas, and integration tutorials at `http://localhost:4747/docs`.

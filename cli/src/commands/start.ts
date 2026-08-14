@@ -11,7 +11,7 @@ export interface StartOptions {
  * Starts the local OpenBoard server and manages process lifecycle.
  */
 export async function startCommand(options: StartOptions = {}): Promise<void> {
-  const port = options.port ? parseInt(String(options.port), 10) : 3000;
+  const port = options.port ? parseInt(String(options.port), 10) : 4747;
   const host = options.host || 'localhost';
 
   try {

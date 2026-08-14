@@ -154,7 +154,7 @@ OpenBoard exposes 13 semantic tools to connected agents:
 ## ✦ CLI Reference
 
 ```bash
-openboard start      # Start local workspace server & open web dashboard (default port: 3000)
+openboard start      # Start local workspace server & open web dashboard (default port: 4747)
 openboard mcp        # Start Model Context Protocol server on stdio for AI agents
 openboard info       # Display local configuration, database path, and agent MCP details
 openboard -v         # Display installed version
@@ -163,7 +163,7 @@ openboard --help     # Display CLI help
 
 ### Options for `openboard start`
 
-- `-p, --port <number>`: Port to listen on (default: `3000`)
+- `-p, --port <number>`: Port to listen on (default: `4747`)
 - `-h, --host <host>`: Host address to bind to (default: `localhost`)
 - `--db <path>`: Custom SQLite database path (default: `~/.openboard/openboard.db`)
 - `--no-open`: Do not automatically open browser on startup
@@ -172,7 +172,7 @@ openboard --help     # Display CLI help
 
 ## ✦ Complete Documentation
 
-Detailed technical guides are available in the repository and in the interactive web UI at `http://localhost:3000/docs`:
+Detailed technical guides are available in the repository and in the interactive web UI at `http://localhost:4747/docs`:
 
 - [Getting Started](docs/getting-started.md)
 - [System Architecture](docs/architecture.md)

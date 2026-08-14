@@ -263,7 +263,7 @@ const GettingStartedDoc: React.FC<DocProps> = ({ copy, copiedKey }) => (
     <p>Launch the OpenBoard local workspace server and dashboard:</p>
     <CodeBox code="openboard start" copyKey="start-cmd" copy={copy} copiedKey={copiedKey} />
     <p>
-      By default, OpenBoard binds strictly to <code>localhost:3000</code> and opens the browser
+      By default, OpenBoard binds strictly to <code>localhost:4747</code> and opens the browser
       dashboard.
     </p>
 

@@ -48,7 +48,7 @@ export class OpenBoardServer {
   private readonly defaultHost: string;
 
   constructor(options: ServerOptions = {}) {
-    this.defaultPort = options.port ?? 3000;
+    this.defaultPort = options.port ?? 4747;
     this.defaultHost = options.host ?? 'localhost';
 
     this.eventBus = options.eventBus ?? new BoardEventBus();

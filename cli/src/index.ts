@@ -5,12 +5,12 @@ const program = new Command();
 program
   .name('openboard')
   .description('Local-first personal whiteboard workspace for developers and external AI agents')
-  .version('0.1.2', '-v, --version', 'Output OpenBoard current version');
+  .version('0.1.4', '-v, --version', 'Output OpenBoard current version');
 
 program
   .command('start')
   .description('Start the local OpenBoard whiteboard workspace, web dashboard, and API server')
-  .option('-p, --port <number>', 'Port to listen on', '3000')
+  .option('-p, --port <number>', 'Port to listen on', '4747')
   .option('-h, --host <host>', 'Host address to bind to (localhost only for security)', 'localhost')
   .option('--db <path>', 'Custom SQLite database file path (defaults to ~/.openboard/openboard.db)')
   .option('--no-open', 'Do not automatically open browser on startup')

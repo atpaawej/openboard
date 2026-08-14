@@ -15,7 +15,7 @@ export async function infoCommand(options: InfoOptions = {}): Promise<void> {
   console.log('');
   console.log('  ✦ OpenBoard System & MCP Information');
   console.log('  ─────────────────────────────────────────────────────────────');
-  console.log('  Version:        \x1b[36m0.1.2\x1b[0m');
+  console.log('  Version:        \x1b[36m0.1.4\x1b[0m');
   console.log('  Data Directory: \x1b[33m' + dataDir + '\x1b[0m');
   console.log('  Database Path:  \x1b[33m' + defaultDbPath + '\x1b[0m');
   console.log('  Runtime Model:  \x1b[32mLocal-First, Zero Cloud, Browser-Optional\x1b[0m');
@@ -45,7 +45,7 @@ export async function infoCommand(options: InfoOptions = {}): Promise<void> {
   console.log('');
   console.log('  Documentation & Web UI:');
   console.log(
-    '    Start local server: \x1b[36mopenboard start\x1b[0m -> navigate to \x1b[36mhttp://localhost:3000/docs\x1b[0m',
+    '    Start local server: \x1b[36mopenboard start\x1b[0m -> navigate to \x1b[36mhttp://localhost:4747/docs\x1b[0m',
   );
   console.log('');
   process.exit(0);
