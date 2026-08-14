@@ -13,6 +13,10 @@
 
 <br />
 
+<img src="./assets/dashboard.png" alt="OpenBoard Workspace Dashboard" width="100%" />
+
+<br />
+
 ```bash
 # Launch directly without installing:
 npx openboard-app start
