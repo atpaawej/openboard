@@ -329,21 +329,192 @@ button {
   color: var(--text-muted);
 }
 
-/* Canvas View */
-.canvas-view {
-  display: flex;
-  flex-direction: column;
+/* Canvas View & Layout */
+.layout-board-mode {
+  width: 100vw;
   height: 100vh;
 }
 
+.app-main-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  overflow: hidden;
+}
+
+.canvas-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--bg-app);
+  overflow: hidden;
+}
+
 .canvas-toolbar {
-  height: 56px;
+  height: 52px;
+  min-height: 52px;
   background-color: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 16px;
+  user-select: none;
+  z-index: 50;
+}
+
+.canvas-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.canvas-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-back-dashboard {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  font-weight: 500;
+  background-color: var(--bg-surface);
+  border-color: var(--border-subtle);
+}
+
+.canvas-title-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.canvas-title-display {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.canvas-title-display:hover {
+  background-color: var(--bg-surface-hover);
+  color: #ffffff;
+}
+
+.canvas-title-input {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  outline: none;
+  width: 260px;
+}
+
+/* Save Status Indicator Badge */
+.save-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.save-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.dot-saved {
+  background-color: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.dot-unsaved {
+  background-color: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.dot-error {
+  background-color: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+.save-status-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--accent-text);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.btn-retry-save {
+  background: none;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+}
+
+.btn-retry-save:hover {
+  color: #ef4444;
+}
+
+/* Canvas Viewport Host */
+.canvas-container {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 52px);
+  background-color: var(--bg-app);
+  overflow: hidden;
+}
+
+.tldraw-mount-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Loading and Error Message Views */
+.canvas-loading-view,
+.canvas-message-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.canvas-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .btn-secondary {
@@ -379,14 +550,6 @@ button {
 
 .btn-primary:hover {
   background-color: var(--accent-primary-hover);
-}
-
-.canvas-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-app);
 }
 
 .canvas-placeholder-card {

@@ -79,19 +79,28 @@ curl http://localhost:3000/api/health
 
 ---
 
-## 📋 Project Status: Phase 1 Complete
+## 📋 Project Status: Phase 2B Complete
 
-* [x] TypeScript monorepo with npm workspaces
-* [x] Deep module architecture for `shared`, `storage`, `core`, `mcp`, `server`, and `web`
-* [x] Decoupled domain models (`BoardMetadata` vs `BoardDocument`)
-* [x] `BoardStorage` abstraction and `MemoryBoardStorage`
-* [x] Central `BoardService` domain layer
-* [x] Health check endpoint `GET /api/health`
-* [x] Minimal React Web app with routes (`/dashboard`, `/board/:id`, `/settings`)
-* [x] CLI package with `openboard start` command
-* [x] Architectural documentation
+* [x] **Phase 1**: Project Foundation & Deep Module Architecture
+  * [x] TypeScript monorepo with npm workspaces
+  * [x] Deep module architecture for `shared`, `storage`, `core`, `mcp`, `server`, and `web`
+  * [x] Decoupled domain models (`BoardMetadata` vs `BoardDocument`)
+  * [x] Central `BoardService` domain layer
+  * [x] CLI package with `openboard start` command
+* [x] **Phase 2A**: SQLite Persistence Engine
+  * [x] Durable SQLite database at `~/.openboard/openboard.db`
+  * [x] Fast WAL mode, transactional safety, soft delete lifecycle
+* [x] **Phase 2B**: tldraw Canvas Integration
+  * [x] Full `tldraw` v3 whiteboard canvas mounted at `/board/:id`
+  * [x] `TldrawDocumentAdapter` for schema normalization and document serialization
+  * [x] `BoardCanvasController` live bridge encapsulating active editor operations
+  * [x] Debounced autosave (1s) ignoring transient cursor/camera movements
+  * [x] Persistence indicator (`Saved`, `Saving...`, `Unsaved changes`, `Save failed`)
+  * [x] Inline board title rename persisted to SQLite
+  * [x] Multiple board isolation & corrupt document resilience
 
 ---
 
 ## 📄 License
 MIT
+

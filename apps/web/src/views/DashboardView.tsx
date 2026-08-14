@@ -6,40 +6,56 @@ export const DashboardView: React.FC = () => {
   const navigate = useNavigate();
   const [boards, setBoards] = useState<BoardSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const fetchBoards = async () => {
+    try {
+      setErrorMessage(null);
+      const res = await fetch('/api/boards');
+      if (res.ok) {
+        const json = await res.json();
+        setBoards(json.data || []);
+      } else {
+        setErrorMessage('Failed to load boards from server.');
+      }
+    } catch (err) {
+      setErrorMessage('Unable to connect to OpenBoard server.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchBoards() {
-      try {
-        const res = await fetch('/api/boards');
-        if (res.ok) {
-          const json = await res.json();
-          setBoards(json.data || []);
-        }
-      } catch {
-        // Handled gracefully
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchBoards();
   }, []);
 
   const handleCreateBoard = async () => {
+    if (creating) return;
+    setCreating(true);
+    setErrorMessage(null);
+
     try {
       const res = await fetch('/api/boards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: `Whiteboard ${boards.length + 1}` }),
+        body: JSON.stringify({
+          name: `Whiteboard ${boards.length + 1}`,
+        }),
       });
+
       if (res.ok) {
         const json = await res.json();
         navigate(`/board/${json.data.metadata.id}`);
         return;
       }
+      const json = await res.json().catch(() => ({}));
+      setErrorMessage(json?.error?.message || 'Failed to create board.');
     } catch {
-      // Fallback direct navigate
+      setErrorMessage('Could not connect to server to create board.');
+    } finally {
+      setCreating(false);
     }
-    navigate(`/board/sample-board-${Date.now()}`);
   };
 
   return (
@@ -47,20 +63,45 @@ export const DashboardView: React.FC = () => {
       <div className="dashboard-top-bar">
         <div className="dashboard-title-group">
           <h1>Whiteboard Workspaces</h1>
-          <p>Local-first canvas for developers, architecture diagrams, and AI agents</p>
+          <p>Local-first canvas for developers, architecture diagrams, and external AI agents</p>
         </div>
-        <button id="btn-create-board" className="btn-primary" onClick={handleCreateBoard}>
-          <span>+</span> New Whiteboard
+        <button
+          id="btn-create-board"
+          className="btn-primary"
+          onClick={handleCreateBoard}
+          disabled={creating}
+        >
+          <span>+</span> {creating ? 'Creating...' : 'New Whiteboard'}
         </button>
       </div>
 
+      {errorMessage && (
+        <div
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: 'var(--radius-sm)',
+            color: '#f87171',
+            fontSize: '0.9rem',
+            marginBottom: '20px',
+          }}
+        >
+          {errorMessage}
+        </div>
+      )}
+
       {loading ? (
-        <p style={{ color: 'var(--text-secondary)' }}>Loading workspace boards...</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)' }}>
+          <div className="canvas-loading-spinner" style={{ width: '20px', height: '20px' }} />
+          <span>Loading workspace boards...</span>
+        </div>
       ) : boards.length > 0 ? (
         <div className="boards-grid">
           {boards.map((b) => (
             <div
               key={b.id}
+              id={`board-card-${b.id}`}
               className="board-card"
               onClick={() => navigate(`/board/${b.id}`)}
               style={{ cursor: 'pointer' }}
@@ -73,48 +114,25 @@ export const DashboardView: React.FC = () => {
                 {b.favorite && <span style={{ color: '#f59e0b' }}>★</span>}
               </div>
               <div className="board-card-footer">
-                <span>ID: {b.id.substring(0, 8)}...</span>
+                <span style={{ fontFamily: 'var(--font-mono)' }}>{b.id.substring(0, 8)}...</span>
                 <span>{new Date(b.updatedAt).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="boards-grid">
-          <div
-            className="board-card"
-            onClick={() => navigate('/board/demo-system-architecture')}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="board-card-header">
-              <div>
-                <div className="board-card-title">System Architecture</div>
-                <div className="board-card-desc">Deep modules and local engine topology</div>
-              </div>
-              <span style={{ color: '#f59e0b' }}>★</span>
-            </div>
-            <div className="board-card-footer">
-              <span>Foundation Sample</span>
-              <span>Today</span>
-            </div>
-          </div>
-
-          <div
-            className="board-card"
-            onClick={() => navigate('/board/demo-agent-workflow')}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="board-card-header">
-              <div>
-                <div className="board-card-title">AI Agent Workflow</div>
-                <div className="board-card-desc">MCP tool orchestration canvas</div>
-              </div>
-            </div>
-            <div className="board-card-footer">
-              <span>Foundation Sample</span>
-              <span>Today</span>
-            </div>
-          </div>
+        <div
+          className="canvas-placeholder-card"
+          style={{ margin: '40px auto', maxWidth: '480px', textAlign: 'center' }}
+        >
+          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>▦</div>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>No Whiteboards Yet</h2>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+            Create your first whiteboard to start sketching diagrams, architecture concepts, and visual workflows.
+          </p>
+          <button id="btn-create-first-board" className="btn-primary" onClick={handleCreateBoard} disabled={creating}>
+            <span>+</span> Create First Whiteboard
+          </button>
         </div>
       )}
     </div>
