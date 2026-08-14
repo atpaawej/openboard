@@ -75,6 +75,7 @@ export class SQLiteBoardRepository implements BoardRepository {
   >;
   private readonly stmtSoftDelete: Database.Statement<[string, string]>;
   private readonly stmtRestore: Database.Statement<[string, string]>;
+  private readonly stmtPermanentDelete: Database.Statement<[string]>;
 
   constructor(options: SQLiteBoardRepositoryOptions = {}) {
     if (options.db) {
@@ -105,9 +106,7 @@ export class SQLiteBoardRepository implements BoardRepository {
       'SELECT * FROM boards WHERE id = ? AND deleted_at IS NULL',
     );
 
-    this.stmtGetAny = this.db.prepare<[string], BoardRow>(
-      'SELECT * FROM boards WHERE id = ?',
-    );
+    this.stmtGetAny = this.db.prepare<[string], BoardRow>('SELECT * FROM boards WHERE id = ?');
 
     this.stmtInsert = this.db.prepare(
       `INSERT INTO boards (id, name, description, created_at, updated_at, favorite, thumbnail, document, deleted_at)
@@ -131,6 +130,8 @@ export class SQLiteBoardRepository implements BoardRepository {
        SET deleted_at = NULL, updated_at = ?
        WHERE id = ? AND deleted_at IS NOT NULL`,
     );
+
+    this.stmtPermanentDelete = this.db.prepare('DELETE FROM boards WHERE id = ?');
   }
 
   async listBoards(options: ListBoardsOptions = {}): Promise<BoardSummary[]> {
@@ -138,7 +139,9 @@ export class SQLiteBoardRepository implements BoardRepository {
       const conditions: string[] = [];
       const params: unknown[] = [];
 
-      if (!options.includeDeleted) {
+      if (options.deletedOnly) {
+        conditions.push('deleted_at IS NOT NULL');
+      } else if (!options.includeDeleted) {
         conditions.push('deleted_at IS NULL');
       }
 
@@ -148,7 +151,9 @@ export class SQLiteBoardRepository implements BoardRepository {
 
       if (options.searchQuery && options.searchQuery.trim().length > 0) {
         const q = `%${options.searchQuery.trim().toLowerCase()}%`;
-        conditions.push('(LOWER(name) LIKE ? OR (description IS NOT NULL AND LOWER(description) LIKE ?))');
+        conditions.push(
+          '(LOWER(name) LIKE ? OR (description IS NOT NULL AND LOWER(description) LIKE ?))',
+        );
         params.push(q, q);
       }
 
@@ -272,6 +277,18 @@ export class SQLiteBoardRepository implements BoardRepository {
       return result.changes > 0;
     } catch (err) {
       throw new StorageOperationError(`Failed to restore board "${id}" in SQLite storage.`, err);
+    }
+  }
+
+  async permanentDeleteBoard(id: BoardId): Promise<boolean> {
+    try {
+      const result = this.stmtPermanentDelete.run(id);
+      return result.changes > 0;
+    } catch (err) {
+      throw new StorageOperationError(
+        `Failed to permanently delete board "${id}" from SQLite storage.`,
+        err,
+      );
     }
   }
 

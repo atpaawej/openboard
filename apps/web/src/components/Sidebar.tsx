@@ -1,27 +1,25 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useHealthCheck } from '../hooks/useHealthCheck.js';
 
 export const Sidebar: React.FC = () => {
   const { isConnected, data } = useHealthCheck();
+  const location = useLocation();
   const navigate = useNavigate();
 
-  const handleCreateBoard = async () => {
-    try {
-      const res = await fetch('/api/boards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Untitled Whiteboard' }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        navigate(`/board/${json.data.metadata.id}`);
-        return;
-      }
-    } catch {
-      // Fallback navigation
+  const searchParams = new URLSearchParams(location.search);
+  const currentFilter = searchParams.get('filter') || 'all';
+  const isDashboard = location.pathname === '/dashboard' || location.pathname === '/';
+
+  const handleCreateClick = () => {
+    // If not on dashboard, go to dashboard first
+    if (!isDashboard) {
+      navigate('/dashboard');
     }
-    navigate(`/board/board-${Date.now()}`);
+    // Dispatch custom event to trigger create modal on dashboard
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('openboard:open-create-modal'));
+    }, 10);
   };
 
   return (
@@ -35,20 +33,81 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        <button id="sidebar-btn-create" className="sidebar-action-btn" onClick={handleCreateBoard}>
-          <span>+</span> New Whiteboard
+        <button
+          id="sidebar-btn-create"
+          type="button"
+          className="sidebar-action-btn"
+          onClick={handleCreateClick}
+          title="New Whiteboard (N)"
+        >
+          <span>+</span>
+          <span>New Whiteboard</span>
+          <span className="kbd-shortcut-hint">N</span>
         </button>
 
         <nav className="sidebar-nav">
           <div className="sidebar-nav-section-title">Workspace</div>
+
           <NavLink
-            to="/dashboard"
-            className={({ isActive }) =>
-              isActive ? 'sidebar-nav-item active' : 'sidebar-nav-item'
+            to="/dashboard?filter=all"
+            className={() =>
+              isDashboard && currentFilter === 'all'
+                ? 'sidebar-nav-item active'
+                : 'sidebar-nav-item'
             }
           >
             <span className="nav-item-icon">▦</span>
             <span>All Boards</span>
+          </NavLink>
+
+          <NavLink
+            to="/dashboard?filter=recent"
+            className={() =>
+              isDashboard && currentFilter === 'recent'
+                ? 'sidebar-nav-item active'
+                : 'sidebar-nav-item'
+            }
+          >
+            <span className="nav-item-icon">🕒</span>
+            <span>Recent</span>
+          </NavLink>
+
+          <NavLink
+            to="/dashboard?filter=favorites"
+            className={() =>
+              isDashboard && currentFilter === 'favorites'
+                ? 'sidebar-nav-item active'
+                : 'sidebar-nav-item'
+            }
+          >
+            <span className="nav-item-icon">★</span>
+            <span>Favorites</span>
+          </NavLink>
+
+          <NavLink
+            to="/dashboard?filter=trash"
+            className={() =>
+              isDashboard && currentFilter === 'trash'
+                ? 'sidebar-nav-item active'
+                : 'sidebar-nav-item'
+            }
+          >
+            <span className="nav-item-icon">🗑</span>
+            <span>Trash</span>
+          </NavLink>
+
+          <div className="sidebar-nav-section-title" style={{ marginTop: '12px' }}>
+            Reference & System
+          </div>
+
+          <NavLink
+            to="/docs"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-nav-item active' : 'sidebar-nav-item'
+            }
+          >
+            <span className="nav-item-icon">📖</span>
+            <span>Documentation</span>
           </NavLink>
 
           <NavLink

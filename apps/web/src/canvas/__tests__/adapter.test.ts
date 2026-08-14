@@ -24,7 +24,10 @@ test('TldrawDocumentAdapter - validates document structure correctly', () => {
 
   // Missing records or invalid records
   assert.equal(TldrawDocumentAdapter.validateDocument({ schemaVersion: 1 }).isValid, false);
-  assert.equal(TldrawDocumentAdapter.validateDocument({ schemaVersion: 1, records: [] }).isValid, false);
+  assert.equal(
+    TldrawDocumentAdapter.validateDocument({ schemaVersion: 1, records: [] }).isValid,
+    false,
+  );
 });
 
 test('TldrawDocumentAdapter - normalizes records with missing meta or baseline records', () => {
@@ -105,7 +108,10 @@ test('TldrawDocumentAdapter - creates store and roundtrips document serializatio
         growY: 0,
         url: '',
         scale: 1,
-        richText: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Architecture Core' }] }] },
+        richText: {
+          type: 'doc',
+          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Architecture Core' }] }],
+        },
       },
       meta: {},
       isLocked: false,
@@ -119,7 +125,10 @@ test('TldrawDocumentAdapter - creates store and roundtrips document serializatio
   const extracted = TldrawDocumentAdapter.extractDocument(store);
   assert.equal(extracted.schemaVersion >= 1, true);
   assert.ok(extracted.records[shapeId]);
-  assert.equal((extracted.records[shapeId] as any).props.richText.content[0].content[0].text, 'Architecture Core');
+  assert.equal(
+    (extracted.records[shapeId] as any).props.richText.content[0].content[0].text,
+    'Architecture Core',
+  );
 
   // Re-hydrate into a second fresh store
   const store2 = TldrawDocumentAdapter.createStoreFromDocument(extracted);
@@ -140,6 +149,6 @@ test('TldrawDocumentAdapter - rejects corrupted document without crashing', () =
     },
     {
       message: /Cannot create tldraw store/,
-    }
+    },
   );
 });

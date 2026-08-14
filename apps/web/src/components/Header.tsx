@@ -40,7 +40,9 @@ export const Header: React.FC = () => {
             backgroundColor: isConnected ? 'var(--status-success)' : '#ef4444',
           }}
         />
-        <span>{isConnected ? `Local Engine (v${data?.version || '0.1.0'})` : 'Engine Offline'}</span>
+        <span>
+          {isConnected ? `Local Engine (v${data?.version || '0.1.0'})` : 'Engine Offline'}
+        </span>
       </div>
     </header>
   );

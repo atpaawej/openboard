@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar.js';
 import { DashboardView } from './views/DashboardView.js';
 import { BoardCanvasView } from './views/BoardCanvasView.js';
 import { SettingsView } from './views/SettingsView.js';
+import { DocsView } from './views/DocsView.js';
 
 export const App: React.FC = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ export const App: React.FC = () => {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardView />} />
           <Route path="/board/:id" element={<BoardCanvasView />} />
+          <Route path="/docs" element={<DocsView />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

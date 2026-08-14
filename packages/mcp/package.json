@@ -15,7 +15,7 @@
     "build": "tsc -b",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
-    "test": "node --test dist/__tests__/*.test.js"
+    "test": "node --test --test-force-exit dist/__tests__/*.test.js"
   },
   "dependencies": {
     "@openboard/core": "*",

@@ -37,3 +37,10 @@ export class StorageOperationError extends OpenBoardError {
     }
   }
 }
+
+export class CanvasOperationError extends OpenBoardError {
+  constructor(message: string, code: string = 'CANVAS_OPERATION_ERROR', statusCode: number = 400) {
+    super(message, code, statusCode);
+    this.name = 'CanvasOperationError';
+  }
+}

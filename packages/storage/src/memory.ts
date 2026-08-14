@@ -21,7 +21,9 @@ export class MemoryBoardRepository implements BoardRepository {
   async listBoards(options: ListBoardsOptions = {}): Promise<BoardSummary[]> {
     let sourceBoards: Board[];
 
-    if (options.includeDeleted) {
+    if (options.deletedOnly) {
+      sourceBoards = Array.from(this.deletedBoards.values());
+    } else if (options.includeDeleted) {
       sourceBoards = [
         ...Array.from(this.boards.values()),
         ...Array.from(this.deletedBoards.values()),
@@ -107,6 +109,12 @@ export class MemoryBoardRepository implements BoardRepository {
     this.deletedBoards.delete(id);
     this.boards.set(id, board);
     return true;
+  }
+
+  async permanentDeleteBoard(id: BoardId): Promise<boolean> {
+    const fromActive = this.boards.delete(id);
+    const fromDeleted = this.deletedBoards.delete(id);
+    return fromActive || fromDeleted;
   }
 
   close(): void {

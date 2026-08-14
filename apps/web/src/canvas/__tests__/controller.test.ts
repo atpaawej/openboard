@@ -14,7 +14,13 @@ test('BoardCanvasController - subscribes strictly to user-generated document cha
   const store = createTLStore();
   store.loadStoreSnapshot({
     store: {
-      'document:document': { typeName: 'document', id: 'document:document', name: '', meta: {}, gridSize: 10 },
+      'document:document': {
+        typeName: 'document',
+        id: 'document:document',
+        name: '',
+        meta: {},
+        gridSize: 10,
+      },
       'page:page': { typeName: 'page', id: 'page:page', name: 'Page 1', index: 'a1', meta: {} },
     } as any,
     schema: store.schema.serialize(),
@@ -41,7 +47,11 @@ test('BoardCanvasController - subscribes strictly to user-generated document cha
 
   // Wait for RAF tick
   await new Promise((r) => setTimeout(r, 40));
-  assert.equal(changeCount, 0, 'Pointer/session mutations must not trigger document autosave listener');
+  assert.equal(
+    changeCount,
+    0,
+    'Pointer/session mutations must not trigger document autosave listener',
+  );
 
   // 2. Document change (adding a page) SHOULD trigger listener
   store.put([
@@ -77,7 +87,56 @@ test('BoardCanvasController - subscribes strictly to user-generated document cha
   await new Promise((r) => setTimeout(r, 40));
   assert.equal(changeCount, 1, 'Remote changes must not trigger user autosave listener');
 
-  // 5. Unsubscribe and disposal
+  // 5. mergeRemoteDocument merges external document changes without triggering user autosave
+  controller.mergeRemoteDocument({
+    schemaVersion: 1,
+    records: {
+      'document:document': {
+        typeName: 'document',
+        id: 'document:document',
+        name: '',
+        meta: {},
+        gridSize: 10,
+      },
+      'page:page': { typeName: 'page', id: 'page:page', name: 'Page 1', index: 'a1', meta: {} },
+      'shape:remote_box': {
+        id: 'shape:remote_box',
+        typeName: 'shape',
+        type: 'geo',
+        x: 200,
+        y: 200,
+        rotation: 0,
+        isLocked: false,
+        opacity: 1,
+        parentId: 'page:page',
+        index: 'a1',
+        props: {
+          w: 100,
+          h: 100,
+          geo: 'rectangle',
+          dash: 'draw',
+          growY: 0,
+          url: '',
+          scale: 1,
+          color: 'blue',
+          labelColor: 'black',
+          fill: 'none',
+          size: 'm',
+          font: 'draw',
+          align: 'middle',
+          verticalAlign: 'middle',
+          richText: { type: 'doc', content: [{ type: 'paragraph' }] },
+        },
+        meta: {},
+      },
+    },
+  });
+
+  await new Promise((r) => setTimeout(r, 40));
+  assert.equal(changeCount, 1, 'mergeRemoteDocument must not trigger user autosave');
+  assert.ok(store.get('shape:remote_box' as any), 'Remote shape must exist in active store');
+
+  // 6. Unsubscribe and disposal
   unsubscribe();
   controller.dispose();
   assert.equal(controller.isDisposed(), true);

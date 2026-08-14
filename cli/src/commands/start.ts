@@ -4,6 +4,7 @@ export interface StartOptions {
   port?: string | number;
   host?: string;
   open?: boolean;
+  db?: string;
 }
 
 /**
@@ -14,7 +15,11 @@ export async function startCommand(options: StartOptions = {}): Promise<void> {
   const host = options.host || 'localhost';
 
   try {
-    const server = createOpenBoardServer({ port, host });
+    const server = createOpenBoardServer({
+      port,
+      host,
+      dbPath: options.db,
+    });
     const info = await server.start();
 
     console.log('');

@@ -42,7 +42,7 @@ export class BoardCanvasController {
           }
         }
       },
-      { scope: 'document', source: 'user' }
+      { scope: 'document', source: 'user' },
     );
   }
 
@@ -58,7 +58,9 @@ export class BoardCanvasController {
    */
   getDocument(): BoardDocument {
     if (!this.editor || this.disposed) {
-      throw new Error('Cannot get document: BoardCanvasController has no active editor or is disposed.');
+      throw new Error(
+        'Cannot get document: BoardCanvasController has no active editor or is disposed.',
+      );
     }
     return TldrawDocumentAdapter.extractDocument(this.editor.store);
   }
@@ -99,6 +101,64 @@ export class BoardCanvasController {
   getViewportBounds(): Box | null {
     if (!this.editor || this.disposed) return null;
     return this.editor.getViewportPageBounds();
+  }
+
+  /**
+   * Generates a lightweight SVG data URL thumbnail of the current board canvas.
+   * Returns null if the board has no shapes or if rendering fails.
+   */
+  async generateThumbnailSvg(): Promise<string | null> {
+    if (!this.editor || this.disposed) return null;
+    try {
+      const shapeIds = Array.from(this.editor.getCurrentPageShapeIds());
+      if (shapeIds.length === 0) {
+        return null;
+      }
+      const result = await this.editor.getSvgString(shapeIds, {
+        scale: 0.5,
+        background: true,
+        padding: 16,
+      });
+      if (result && result.svg) {
+        return `data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`;
+      }
+    } catch (err) {
+      console.warn('[BoardCanvasController] Failed to generate SVG thumbnail:', err);
+    }
+    return null;
+  }
+
+  /**
+   * Merges an updated remote BoardDocument into the active tldraw store.
+   * Uses store.mergeRemoteChanges to preserve camera/session state and
+   * avoid triggering local autosave cycles.
+   */
+  mergeRemoteDocument(doc: BoardDocument): void {
+    if (!this.editor || this.disposed) return;
+
+    const normalizedRecords = TldrawDocumentAdapter.normalizeRecords(doc.records);
+    const store = this.editor.store;
+
+    store.mergeRemoteChanges(() => {
+      // Identify records present in store but absent in new document (e.g. deleted shapes/bindings)
+      const currentDocSnapshot = store.getStoreSnapshot('document').store;
+      const idsToRemove: any[] = [];
+      for (const id of Object.keys(currentDocSnapshot)) {
+        if (!normalizedRecords[id] && (id.startsWith('shape:') || id.startsWith('binding:'))) {
+          idsToRemove.push(id);
+        }
+      }
+
+      if (idsToRemove.length > 0) {
+        store.remove(idsToRemove);
+      }
+
+      // Put updated or created records
+      const recordsToPut = Object.values(normalizedRecords) as any[];
+      if (recordsToPut.length > 0) {
+        store.put(recordsToPut);
+      }
+    });
   }
 
   /**

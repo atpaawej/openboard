@@ -17,7 +17,7 @@
     "start": "node ./dist/main.js",
     "dev": "node --watch ./src/main.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --test dist/__tests__/*.test.js"
+    "test": "node --test --test-force-exit dist/__tests__/*.test.js"
   },
   "dependencies": {
     "@openboard/core": "*",

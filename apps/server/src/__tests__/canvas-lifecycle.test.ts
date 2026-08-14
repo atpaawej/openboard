@@ -71,7 +71,12 @@ test('Canvas Integration - full lifecycle, persistence, multiple board isolation
             fill: 'semi',
             dash: 'draw',
             size: 'm',
-            richText: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Database Service' }] }] },
+            richText: {
+              type: 'doc',
+              content: [
+                { type: 'paragraph', content: [{ type: 'text', text: 'Database Service' }] },
+              ],
+            },
           },
           meta: {},
         },
@@ -117,7 +122,7 @@ test('Canvas Integration - full lifecycle, persistence, multiple board isolation
     assert.ok(reloadJson.data.document.records[shape1Id]);
     assert.equal(
       (reloadJson.data.document.records[shape1Id] as any).props.richText.content[0].content[0].text,
-      'Database Service'
+      'Database Service',
     );
     assert.ok(reloadJson.data.document.records[shape2Id]);
 
@@ -167,7 +172,12 @@ test('Canvas Integration - full lifecycle, persistence, multiple board isolation
           props: {
             color: 'yellow',
             size: 'm',
-            richText: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Board B Secret Note' }] }] },
+            richText: {
+              type: 'doc',
+              content: [
+                { type: 'paragraph', content: [{ type: 'text', text: 'Board B Secret Note' }] },
+              ],
+            },
           },
           meta: {},
         },
@@ -219,8 +229,9 @@ test('Canvas Integration - full lifecycle, persistence, multiple board isolation
     assert.ok(postRestartAJson.data.document.records[shape1Id]);
     assert.ok(postRestartAJson.data.document.records[shape2Id]);
     assert.equal(
-      (postRestartAJson.data.document.records[shape1Id] as any).props.richText.content[0].content[0].text,
-      'Database Service'
+      (postRestartAJson.data.document.records[shape1Id] as any).props.richText.content[0].content[0]
+        .text,
+      'Database Service',
     );
 
     // Verify Board B content survived the restart independently
@@ -230,8 +241,9 @@ test('Canvas Integration - full lifecycle, persistence, multiple board isolation
     assert.equal(postRestartBJson.data.metadata.name, 'Isolated Board B');
     assert.ok(postRestartBJson.data.document.records[shapeBId]);
     assert.equal(
-      (postRestartBJson.data.document.records[shapeBId] as any).props.richText.content[0].content[0].text,
-      'Board B Secret Note'
+      (postRestartBJson.data.document.records[shapeBId] as any).props.richText.content[0].content[0]
+        .text,
+      'Board B Secret Note',
     );
   } finally {
     await server.stop();

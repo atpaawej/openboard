@@ -69,6 +69,8 @@ test('MemoryBoardRepository CRUD operations and filtering', async () => {
   assert.equal(afterDelete, null);
   const listAfterDelete = await repository.listBoards();
   assert.equal(listAfterDelete.length, 0);
+  const trashList = await repository.listBoards({ deletedOnly: true });
+  assert.equal(trashList.length, 1);
 
   // 6. Restore
   const restored = await repository.restoreBoard('test-board-1');
@@ -76,6 +78,12 @@ test('MemoryBoardRepository CRUD operations and filtering', async () => {
   const afterRestore = await repository.getBoard('test-board-1');
   assert.ok(afterRestore);
   assert.equal(afterRestore.metadata.id, 'test-board-1');
+
+  // 7. Permanent Delete
+  const permDeleted = await repository.permanentDeleteBoard('test-board-1');
+  assert.equal(permDeleted, true);
+  const listAfterPermDelete = await repository.listBoards({ includeDeleted: true });
+  assert.equal(listAfterPermDelete.length, 0);
 
   repository.close();
 });

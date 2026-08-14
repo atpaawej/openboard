@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
-    "test": "npx tsx --test src/canvas/__tests__/index.test.ts"
+    "test": "npx tsx --test --test-force-exit src/canvas/__tests__/index.test.ts"
   },
   "dependencies": {
     "@openboard/shared": "*",

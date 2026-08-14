@@ -1,131 +1,111 @@
-# OpenBoard Architecture
+# OpenBoard System Architecture
 
-OpenBoard is a local-first personal whiteboard workspace designed specifically for developers and AI agents. It operates 100% locally on the user's machine with zero cloud backends, zero user accounts, and zero remote dependencies.
+OpenBoard is built on local-first, deep-module architectural principles, providing clean interfaces between developer CLI tooling, local HTTP servers, headless canvas engines, and Model Context Protocol (MCP) agents.
 
 ---
 
-## 1. Deep Module Architecture
-
-The codebase follows John Ousterhout's *Philosophy of Software Design* regarding **Deep Modules**:
-
-* **Small, simple public interfaces** hiding rich internal functionality.
-* **Thorough information hiding**: neither the Web UI nor the MCP agent protocol knows about raw storage schemas, disk layouts, or atomic write mechanics.
-* **Single source of domain truth**: All clients (Web UI, MCP server, CLI) interact exclusively through the domain `BoardService` in `packages/core`.
+## 1. High-Level Architecture
 
 ```text
-┌───────────────────────────────────────────────────────────┐
-│                      Clients Layer                        │
-│                                                           │
-│   ┌───────────────┐     ┌───────────────┐     ┌───────┐   │
-│   │    Web UI     │     │  MCP Server   │     │  CLI  │   │
-│   └───────┬───────┘     └───────┬───────┘     └───┬───┘   │
-└───────────┼─────────────────────┼─────────────────┼───────┘
-            │                     │                 │
-            ▼                     ▼                 ▼
-┌───────────────────────────────────────────────────────────┐
-│              Domain Service Layer (@openboard/core)       │
-│                                                           │
-│                    ┌──────────────┐                       │
-│                    │ BoardService │                       │
-│                    └──────┬───────┘                       │
-└───────────────────────────┼───────────────────────────────┘
+                         OPENBOARD
                             │
-                            ▼
-┌───────────────────────────────────────────────────────────┐
-│            Storage Abstraction (@openboard/storage)       │
-│                                                           │
-│                   ┌──────────────┐                        │
-│                   │ BoardStorage │ (Interface)            │
-│                   └───────┬──────┘                        │
-│                           │                               │
-│            ┌──────────────┴──────────────┐                │
-│            ▼                             ▼                │
-│   MemoryBoardStorage             FileBoardStorage         │
-│                                  (~/.openboard)           │
-└───────────────────────────────────────────────────────────┘
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+       CLI                 Web                 MCP
+        │                   │                   │
+        │             Dashboard/Canvas    External Agents
+        │                   │             Claude Code / Cursor /
+        │                   │             OpenCode / Codex /
+        │                   │             OpenClaw / Hermes
+        │                   │
+        └───────────────────┼───────────────────┘
+                            │
+                      BoardService
+                            │
+                 ┌──────────┴──────────┐
+                 │                     │
+            CanvasService        BoardRepository
+                 │                     │
+        HeadlessCanvasEngine        SQLite
+                 │
+              tldraw
+                 │
+          optional browser
 ```
 
 ---
 
-## 2. Package Responsibilities
+## 2. Core Architectural Invariants
 
-### `packages/shared` (`@openboard/shared`)
-* **Role**: Domain types, result structures, and error primitives.
-* **Responsibilities**:
-  * Definitive models: `BoardId`, `BoardMetadata`, `BoardDocument`, `Board`, `BoardSummary`.
-  * API contracts: `HealthCheckResponse`, `ApiResponse<T>`.
-  * Base error hierarchy: `OpenBoardError`, `BoardNotFoundError`, `BoardValidationError`, `StorageOperationError`.
-* **Zero dependencies** on other workspace packages or external frameworks.
+### 1. Browser Optionality
 
-### `packages/storage` (`@openboard/storage`)
-* **Role**: Persistence abstraction.
-* **Responsibilities**:
-  * `BoardStorage` interface defining CRUD operations: `listBoards()`, `getBoard()`, `createBoard()`, `updateBoard()`, `deleteBoard()`, `restoreBoard()`.
-  * `MemoryBoardStorage` for fast in-memory execution, testing, and isolated staging.
-  * Extensible design ready for atomic file-system writes under `~/.openboard/boards/` in Phase 2.
-  * Completely conceals serialization format, file I/O, and disk structure from upper layers.
+The application does not depend on a running browser or active frontend window.
 
-### `packages/core` (`@openboard/core`)
-* **Role**: Central domain service.
-* **Responsibilities**:
-  * `BoardService`: The single source of truth for business logic.
-  * Encapsulates ID generation, timestamps, validation, default canvas schemas, soft/hard deletion, board duplication, and favorites toggling.
-  * Prevents duplicate business logic between the Web app and AI agents.
+- External AI agents can list boards, create boards, manipulate shapes, inspect semantic canvas state, and capture vector screenshots headlessly.
+- When a board is opened in a browser, changes made by an agent project in real time via Server-Sent Events (SSE).
 
-### `packages/mcp` (`@openboard/mcp`)
-* **Role**: Model Context Protocol (MCP) server for AI agents.
-* **Responsibilities**:
-  * Exposes agent tools (`list_boards`, `get_board`, `create_board`, etc.).
-  * Translates agent tool calls directly into domain calls on `BoardService`.
-  * Never interacts directly with disk files or raw storage.
+### 2. Explicit Board Addressing (No Implicit Active Board)
 
-### `apps/server` (`@openboard/server`)
-* **Role**: Local Node.js HTTP backend.
-* **Responsibilities**:
-  * `OpenBoardServer` deep module.
-  * Serves REST API (`/api/health`, `/api/boards`).
-  * Provides programmatic `start()` / `stop()` methods for the CLI and standalone daemon execution.
-  * Ready to serve static Web assets in production distribution.
+There is no concept of a global "active board" in the backend or MCP layer.
 
-### `apps/web` (`@openboard/web`)
-* **Role**: Frontend SPA.
-* **Responsibilities**:
-  * Built with React + Vite.
-  * Pure Vanilla CSS design tokens (fast, responsive, zero bloated CSS runtime).
-  * Routes:
-    * `/dashboard`: Board management and status.
-    * `/board/:id`: Whiteboard canvas (prepared for tldraw).
-    * `/settings`: Local workspace configuration.
+- Every canvas operation explicitly requires a `board_id`.
+- Multiple agents or concurrent CLI commands can operate on different boards independently without collision.
 
-### `cli` (`openboard`)
-* **Role**: Developer command line interface.
-* **Responsibilities**:
-  * Binary command `openboard start` with port/host configuration.
-  * Manages the lifecycle of the local server.
-  * Structured for seamless browser opening upon startup.
+### 3. Deep Domain Boundaries
+
+- **`@openboard/shared`:** Pure TypeScript interfaces and errors. Zero dependencies on database drivers or UI frameworks.
+- **`@openboard/storage`:** SQLite persistence repository using schema migrations, atomic transactions, and soft-delete capabilities.
+- **`@openboard/core`:** Pure business logic (`BoardService`, `CanvasService`, `HeadlessCanvasEngine`, `HeadlessSvgRenderer`, and `BoardEventBus`).
+- **`@openboard/server`:** Express HTTP REST & SSE streaming server.
+- **`@openboard/mcp`:** Model Context Protocol stdio server translating agent tool calls to domain operations.
+- **`@openboard/web`:** React + Vite + tldraw client dashboard and canvas UI.
+- **`cli`:** Commander.js CLI binary executable.
 
 ---
 
-## 3. Data Structure Separation
+## 3. Data Flow
 
-Board state is strictly separated into two distinct components:
+### Agent MCP Mutation Flow (Browser Closed)
 
 ```text
-Board
- ├── metadata: BoardMetadata
- │     ├── id: string
- │     ├── name: string
- │     ├── createdAt: ISOString
- │     ├── updatedAt: ISOString
- │     ├── favorite: boolean
- │     └── thumbnail?: string | null
- │
- └── document: BoardDocument
-       ├── schemaVersion: number
-       └── records: Record<string, unknown> (tldraw store snapshot)
+Agent Tool Call (e.g. create_shapes)
+   ↓ (stdio JSON-RPC)
+OpenBoardMcpServer
+   ↓
+CanvasService.createShapes(board_id, shapes)
+   ↓
+HeadlessCanvasEngine (loads TLStore snapshot, validates shapes, applies mutations)
+   ↓
+BoardService.updateBoard(board_id, { document })
+   ↓
+SQLiteBoardRepository (persists updated document to SQLite)
 ```
 
-**Why this separation matters**:
-1. **Performance**: Dashboard listings only need lightweight metadata, avoiding loading megabytes of canvas records for dozens of boards.
-2. **AI Agent Efficiency**: Agents can query metadata without deserializing the entire drawing graph when performing search or categorization.
-3. **Storage Flexibility**: Allows storing metadata in a fast index (or JSON header) while persisting heavy document snapshots independently.
+### Agent MCP Mutation Flow (Browser Open)
+
+```text
+Agent Tool Call
+   ↓
+OpenBoardMcpServer
+   ↓
+CanvasService & BoardService
+   ├──→ SQLiteBoardRepository (persisted to disk)
+   └──→ BoardEventBus.emit('canvas:updated', { boardId, document })
+           ↓ (SSE streaming)
+        Browser EventSource
+           ↓
+        BoardCanvasController.applyExternalDocument()
+           ↓
+        tldraw live canvas updates visually
+```
+
+---
+
+## 4. Headless Visual Inspection
+
+To allow multimodal AI agents to visually inspect whiteboard scenes without launching headless Chromium or electron processes, OpenBoard provides `HeadlessSvgRenderer`.
+
+- Generates clean, standards-compliant vector SVGs directly from SQLite board documents.
+- Calculates content-aware bounding boxes with configurable padding.
+- Renders shapes (`geo`, `note`, `text`, `arrow`, `frame`, `line`, `draw`) with styling, themes, and arrow connections.
+- Encodes output to standard MCP image content blocks (`image/svg+xml`) and SVG text strings.

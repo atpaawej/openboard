@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Tldraw, type Editor, type TLStore } from 'tldraw';
 import type { Board } from '@openboard/shared';
-import { TldrawDocumentAdapter, BoardCanvasController, useBoardAutosave } from '../canvas/index.js';
+import {
+  TldrawDocumentAdapter,
+  BoardCanvasController,
+  useBoardAutosave,
+  useBoardLiveSync,
+} from '../canvas/index.js';
 
 type BoardViewStatus = 'loading' | 'ready' | 'not-found' | 'error' | 'corrupt-document';
 
@@ -24,10 +29,24 @@ export const BoardCanvasView: React.FC = () => {
   const controllerInstanceRef = useRef<BoardCanvasController | null>(null);
 
   // Autosave coordination
-  const { saveStatus, errorMessage: saveErrorMessage, saveNow } = useBoardAutosave({
+  const {
+    saveStatus,
+    errorMessage: saveErrorMessage,
+    saveNow,
+  } = useBoardAutosave({
     boardId: id || '',
     controller,
     debounceMs: 1000,
+  });
+
+  // Live SSE synchronization from external AI agent MCP mutations
+  useBoardLiveSync({
+    boardId: id || '',
+    controller,
+    onBoardMetadataUpdated: (metadata) => {
+      setBoard((prev) => (prev ? { ...prev, metadata } : null));
+      setTitleInput(metadata.name);
+    },
   });
 
   // Fetch and initialize board
@@ -58,7 +77,9 @@ export const BoardCanvasView: React.FC = () => {
 
       // Validate and initialize tldraw store
       try {
-        const initializedStore = TldrawDocumentAdapter.createStoreFromDocument(loadedBoard.document);
+        const initializedStore = TldrawDocumentAdapter.createStoreFromDocument(
+          loadedBoard.document,
+        );
         setBoard(loadedBoard);
         setTitleInput(loadedBoard.metadata.name);
         setStore(initializedStore);
@@ -71,13 +92,15 @@ export const BoardCanvasView: React.FC = () => {
         setErrorMessage(
           docErr instanceof Error
             ? docErr.message
-            : 'Stored whiteboard document format is invalid or incompatible.'
+            : 'Stored whiteboard document format is invalid or incompatible.',
         );
       }
     } catch (err) {
       console.error('[BoardCanvasView] Failed to fetch board:', err);
       setStatus('error');
-      setErrorMessage(err instanceof Error ? err.message : 'Unable to connect to the OpenBoard server.');
+      setErrorMessage(
+        err instanceof Error ? err.message : 'Unable to connect to the OpenBoard server.',
+      );
     }
   }, [id]);
 
@@ -167,7 +190,11 @@ export const BoardCanvasView: React.FC = () => {
           <p>
             The requested board <code>{id}</code> does not exist in local SQLite storage.
           </p>
-          <button id="btn-return-dashboard" className="btn-primary" onClick={() => navigate('/dashboard')}>
+          <button
+            id="btn-return-dashboard"
+            className="btn-primary"
+            onClick={() => navigate('/dashboard')}
+          >
             ← Return to Dashboard
           </button>
         </div>
@@ -182,8 +209,8 @@ export const BoardCanvasView: React.FC = () => {
         <div className="canvas-placeholder-card" style={{ borderColor: '#ef4444' }}>
           <h2 style={{ color: '#ef4444' }}>Document Data Error</h2>
           <p>
-            The stored whiteboard document for <strong>{board?.metadata.name || id}</strong> could not be loaded
-            safely:
+            The stored whiteboard document for <strong>{board?.metadata.name || id}</strong> could
+            not be loaded safely:
           </p>
           <div
             style={{
@@ -204,7 +231,9 @@ export const BoardCanvasView: React.FC = () => {
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             Your original stored data in SQLite has been preserved and was not overwritten.
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
+          <div
+            style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}
+          >
             <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
               ← Return to Dashboard
             </button>
@@ -224,7 +253,9 @@ export const BoardCanvasView: React.FC = () => {
         <div className="canvas-placeholder-card" style={{ borderColor: '#ef4444' }}>
           <h2 style={{ color: '#ef4444' }}>Connection Error</h2>
           <p>{errorMessage || 'Failed to communicate with OpenBoard server.'}</p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
+          <div
+            style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}
+          >
             <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
               ← Return to Dashboard
             </button>
@@ -322,11 +353,7 @@ export const BoardCanvasView: React.FC = () => {
       <main className="canvas-container">
         {store && (
           <div className="tldraw-mount-wrapper">
-            <Tldraw
-              store={store}
-              onMount={handleMount}
-              autoFocus
-            />
+            <Tldraw store={store} onMount={handleMount} autoFocus />
           </div>
         )}
       </main>

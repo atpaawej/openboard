@@ -5,6 +5,10 @@
   "description": "OpenBoard — Local-first personal whiteboard workspace for developers and AI agents",
   "author": "OpenBoard Contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atpaawej/openboard.git"
+  },
   "type": "module",
   "workspaces": [
     "apps/*",
@@ -12,7 +16,10 @@
     "cli"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build:packages": "npm run build --workspace=@openboard/shared --workspace=@openboard/storage --workspace=@openboard/core --workspace=@openboard/mcp",
+    "build:apps": "npm run build --workspace=@openboard/web --workspace=@openboard/server",
+    "build:cli": "npm run build --workspace=openboard",
+    "build": "npm run build:packages && npm run build:apps && npm run build:cli",
     "dev": "npm run dev --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
@@ -23,6 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.4",
+    "esbuild": "^0.25.0",
     "eslint": "^9.20.1",
     "prettier": "^3.5.1",
     "typescript": "^5.7.3"

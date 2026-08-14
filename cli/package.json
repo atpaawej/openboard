@@ -1,34 +1,70 @@
 {
   "name": "openboard",
   "version": "0.1.0",
-  "private": true,
-  "description": "CLI for OpenBoard — local-first personal whiteboard workspace",
+  "description": "Local-first whiteboard for humans and AI agents",
   "type": "module",
   "bin": {
     "openboard": "./bin/openboard.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+  "files": [
+    "bin",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "web",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Aawej & OpenBoard Contributors",
+  "license": "MIT",
+  "homepage": "https://github.com/atpaawej/openboard#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atpaawej/openboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atpaawej/openboard/issues"
+  },
+  "keywords": [
+    "whiteboard",
+    "tldraw",
+    "mcp",
+    "model-context-protocol",
+    "ai-agents",
+    "local-first",
+    "diagrams",
+    "canvas",
+    "architecture",
+    "claude-code",
+    "cursor",
+    "opencode",
+    "codex"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "build": "node ./build.js",
+    "clean": "rm -rf dist web tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openboard/core": "*",
-    "@openboard/server": "*",
-    "@openboard/shared": "*",
-    "@openboard/storage": "*",
-    "commander": "^13.1.0"
+    "better-sqlite3": "^13.0.3",
+    "commander": "^13.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "tldraw": "^3.15.6"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.13.4",
+    "esbuild": "^0.25.0",
     "typescript": "^5.7.3"
   }
 }

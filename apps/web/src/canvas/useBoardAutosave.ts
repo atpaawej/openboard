@@ -47,10 +47,20 @@ export function useBoardAutosave({
       setErrorMessage(null);
 
       try {
+        let thumbnail: string | null | undefined = undefined;
+        if (controllerRef.current) {
+          thumbnail = await controllerRef.current.generateThumbnailSvg().catch(() => null);
+        }
+
+        const payload: Record<string, unknown> = { document: doc };
+        if (thumbnail !== undefined) {
+          payload.thumbnail = thumbnail;
+        }
+
         const response = await fetch(`/api/boards/${boardId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ document: doc }),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
@@ -90,7 +100,7 @@ export function useBoardAutosave({
         return false;
       }
     },
-    [boardId, debounceMs, onSaveSuccess, onSaveError]
+    [boardId, debounceMs, onSaveSuccess, onSaveError],
   );
 
   const saveNow = useCallback(async (): Promise<boolean> => {

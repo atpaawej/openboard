@@ -50,6 +50,12 @@ test('BoardService with MemoryBoardRepository handles board domain operations an
   assert.equal(restored, true);
   const afterRestore = await service.getBoard(board.metadata.id);
   assert.equal(afterRestore.metadata.id, board.metadata.id);
+
+  // 9. Permanent delete
+  const permDeleted = await service.permanentDeleteBoard(board.metadata.id);
+  assert.equal(permDeleted, true);
+  const trashAfterPerm = await service.listBoards({ deletedOnly: true });
+  assert.equal(trashAfterPerm.length, 0);
 });
 
 test('BoardService with SQLiteBoardRepository (:memory:) behaves identically', async () => {
@@ -99,6 +105,12 @@ test('BoardService with SQLiteBoardRepository (:memory:) behaves identically', a
   assert.equal(restored, true);
   const afterRestore = await service.getBoard(board.metadata.id);
   assert.equal(afterRestore.metadata.id, board.metadata.id);
+
+  // 9. Permanent delete
+  const permDeleted = await service.permanentDeleteBoard(board.metadata.id);
+  assert.equal(permDeleted, true);
+  const trashAfterPerm = await service.listBoards({ deletedOnly: true });
+  assert.equal(trashAfterPerm.length, 0);
 
   repository.close();
 });

@@ -76,15 +76,77 @@ test('OpenBoardServer starts with SQLite repository and handles board API lifecy
   assert.equal(patchJson.data.metadata.name, 'Updated Server Board');
   assert.equal(patchJson.data.metadata.favorite, false);
 
-  // 6. Delete board
+  // 6. Duplicate board via POST /api/boards/:id/duplicate
+  const dupRes = await fetch(`${info.url}/api/boards/${boardId}/duplicate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Cloned Server Board' }),
+  });
+  assert.equal(dupRes.status, 201);
+  const dupJson = (await dupRes.json()) as {
+    success: boolean;
+    data: { metadata: { id: string; name: string } };
+  };
+  assert.equal(dupJson.success, true);
+  assert.equal(dupJson.data.metadata.name, 'Cloned Server Board');
+  const dupBoardId = dupJson.data.metadata.id;
+
+  // 7. Toggle favorite via POST /api/boards/:id/favorite
+  const favRes = await fetch(`${info.url}/api/boards/${dupBoardId}/favorite`, {
+    method: 'POST',
+  });
+  assert.equal(favRes.status, 200);
+  const favJson = (await favRes.json()) as {
+    success: boolean;
+    data: { metadata: { favorite: boolean } };
+  };
+  assert.equal(favJson.data.metadata.favorite, true);
+
+  // 8. Filter by favorites
+  const favListRes = await fetch(`${info.url}/api/boards?filter=favorites`);
+  assert.equal(favListRes.status, 200);
+  const favListJson = (await favListRes.json()) as {
+    success: boolean;
+    data: Array<{ id: string }>;
+  };
+  assert.equal(favListJson.data.length, 1);
+  assert.equal(favListJson.data[0]?.id, dupBoardId);
+
+  // 9. Soft Delete original board
   const deleteRes = await fetch(`${info.url}/api/boards/${boardId}`, {
     method: 'DELETE',
   });
   assert.equal(deleteRes.status, 200);
 
-  // 7. Get deleted board returns 404
+  // 10. Get deleted board returns 404
   const getAfterDeleteRes = await fetch(`${info.url}/api/boards/${boardId}`);
   assert.equal(getAfterDeleteRes.status, 404);
+
+  // 11. Trash query shows deleted board
+  const trashRes = await fetch(`${info.url}/api/boards?filter=trash`);
+  assert.equal(trashRes.status, 200);
+  const trashJson = (await trashRes.json()) as { success: boolean; data: Array<{ id: string }> };
+  assert.equal(trashJson.data.length, 1);
+  assert.equal(trashJson.data[0]?.id, boardId);
+
+  // 12. Restore deleted board
+  const restoreRes = await fetch(`${info.url}/api/boards/${boardId}/restore`, {
+    method: 'POST',
+  });
+  assert.equal(restoreRes.status, 200);
+
+  // 13. Permanent delete
+  const permDeleteRes = await fetch(`${info.url}/api/boards/${boardId}/permanent`, {
+    method: 'DELETE',
+  });
+  assert.equal(permDeleteRes.status, 200);
+
+  const trashAfterPerm = await fetch(`${info.url}/api/boards?filter=trash`);
+  const trashAfterPermJson = (await trashAfterPerm.json()) as {
+    success: boolean;
+    data: Array<{ id: string }>;
+  };
+  assert.equal(trashAfterPermJson.data.length, 0);
 
   await server.stop();
   repository.close();

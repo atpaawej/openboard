@@ -14,7 +14,9 @@ export const SettingsView: React.FC = () => {
         <div className="settings-row">
           <div>
             <div className="settings-label">Storage Driver</div>
-            <div className="settings-desc">Persistent local directory for whiteboard document state</div>
+            <div className="settings-desc">
+              Persistent local directory for whiteboard document state
+            </div>
           </div>
           <div className="settings-value">Local Filesystem (~/.openboard)</div>
         </div>
@@ -32,7 +34,9 @@ export const SettingsView: React.FC = () => {
             <div className="settings-label">Network Architecture</div>
             <div className="settings-desc">Telemetry and cloud dependencies</div>
           </div>
-          <div className="settings-value" style={{ color: 'var(--status-success)' }}>100% Offline / Local-Only</div>
+          <div className="settings-value" style={{ color: 'var(--status-success)' }}>
+            100% Offline / Local-Only
+          </div>
         </div>
 
         <div className="settings-row">

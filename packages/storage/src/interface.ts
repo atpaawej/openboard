@@ -9,6 +9,7 @@ export interface ListBoardsOptions {
   sortBy?: 'updatedAt' | 'createdAt' | 'name';
   sortDirection?: 'asc' | 'desc';
   includeDeleted?: boolean;
+  deletedOnly?: boolean;
 }
 
 /**
@@ -52,6 +53,12 @@ export interface BoardRepository {
    * Returns true if restored, false if not found in deleted state.
    */
   restoreBoard(id: BoardId): Promise<boolean>;
+
+  /**
+   * Permanently deletes a board from storage.
+   * Returns true if deleted, false if not found.
+   */
+  permanentDeleteBoard(id: BoardId): Promise<boolean>;
 
   /**
    * Gracefully closes database connection and releases resources.

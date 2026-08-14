@@ -10,6 +10,7 @@ import { BoardNotFoundError, BoardValidationError } from '@openboard/shared';
 import type { BoardRepository, ListBoardsOptions } from '@openboard/storage';
 import { generateBoardId } from './id.js';
 import { createDefaultBoardDocument } from './defaults.js';
+import type { BoardEventBus } from './events.js';
 
 /**
  * BoardService is the central domain service for OpenBoard.
@@ -21,9 +22,11 @@ import { createDefaultBoardDocument } from './defaults.js';
  */
 export class BoardService {
   private readonly repository: BoardRepository;
+  private readonly eventBus?: BoardEventBus;
 
-  constructor(repository: BoardRepository) {
+  constructor(repository: BoardRepository, eventBus?: BoardEventBus) {
     this.repository = repository;
+    this.eventBus = eventBus;
   }
 
   /**
@@ -81,6 +84,8 @@ export class BoardService {
     };
 
     await this.repository.createBoard(board);
+    this.eventBus?.emit('board:created', { boardId: id, board });
+
     return board;
   }
 
@@ -93,8 +98,12 @@ export class BoardService {
 
     const updatedMetadata: BoardMetadata = {
       ...existing.metadata,
-      name: input.name !== undefined ? (input.name.trim() || existing.metadata.name) : existing.metadata.name,
-      description: input.description !== undefined ? input.description.trim() : existing.metadata.description,
+      name:
+        input.name !== undefined
+          ? input.name.trim() || existing.metadata.name
+          : existing.metadata.name,
+      description:
+        input.description !== undefined ? input.description.trim() : existing.metadata.description,
       favorite: input.favorite !== undefined ? input.favorite : existing.metadata.favorite,
       thumbnail: input.thumbnail !== undefined ? input.thumbnail : existing.metadata.thumbnail,
       updatedAt: now,
@@ -106,7 +115,19 @@ export class BoardService {
     };
 
     await this.repository.updateBoard(updatedBoard);
+    this.eventBus?.emit('board:updated', { boardId: id, board: updatedBoard });
+
     return updatedBoard;
+  }
+
+  /**
+   * Convenience method to rename a board.
+   */
+  async renameBoard(id: BoardId, newName: string): Promise<Board> {
+    if (!newName || typeof newName !== 'string' || newName.trim().length === 0) {
+      throw new BoardValidationError('A non-empty board name is required.');
+    }
+    return this.updateBoard(id, { name: newName.trim() });
   }
 
   /**
@@ -126,7 +147,12 @@ export class BoardService {
     if (!id || typeof id !== 'string') {
       throw new BoardValidationError('A valid board ID is required.');
     }
-    return this.repository.deleteBoard(id.trim());
+    const cleanId = id.trim();
+    const success = await this.repository.deleteBoard(cleanId);
+    if (success) {
+      this.eventBus?.emit('board:deleted', { boardId: cleanId });
+    }
+    return success;
   }
 
   /**
@@ -136,7 +162,27 @@ export class BoardService {
     if (!id || typeof id !== 'string') {
       throw new BoardValidationError('A valid board ID is required.');
     }
-    return this.repository.restoreBoard(id.trim());
+    const cleanId = id.trim();
+    const success = await this.repository.restoreBoard(cleanId);
+    if (success) {
+      this.eventBus?.emit('board:restored', { boardId: cleanId });
+    }
+    return success;
+  }
+
+  /**
+   * Permanently deletes a board from storage.
+   */
+  async permanentDeleteBoard(id: BoardId): Promise<boolean> {
+    if (!id || typeof id !== 'string') {
+      throw new BoardValidationError('A valid board ID is required.');
+    }
+    const cleanId = id.trim();
+    const success = await this.repository.permanentDeleteBoard(cleanId);
+    if (success) {
+      this.eventBus?.emit('board:deleted', { boardId: cleanId });
+    }
+    return success;
   }
 
   /**
@@ -161,6 +207,8 @@ export class BoardService {
     };
 
     await this.repository.createBoard(duplicatedBoard);
+    this.eventBus?.emit('board:created', { boardId: newId, board: duplicatedBoard });
+
     return duplicatedBoard;
   }
 }

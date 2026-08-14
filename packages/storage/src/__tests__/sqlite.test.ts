@@ -10,7 +10,10 @@ import { StorageOperationError } from '@openboard/shared';
 import type { Board } from '@openboard/shared';
 
 function createTempDbPath(): string {
-  const tmpDir = path.join(os.tmpdir(), `openboard-test-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`);
+  const tmpDir = path.join(
+    os.tmpdir(),
+    `openboard-test-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+  );
   return path.join(tmpDir, 'sub', 'openboard.db');
 }
 
@@ -34,7 +37,9 @@ test('SQLiteBoardRepository - Database initialization & automatic directory crea
 
   // Check that schema_migrations table was created
   const dbRaw = new Database(dbPath);
-  const tables = dbRaw.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[];
+  const tables = dbRaw.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as {
+    name: string;
+  }[];
   const tableNames = tables.map((t) => t.name);
 
   assert.ok(tableNames.includes('boards'), 'boards table must exist');
@@ -478,6 +483,58 @@ test('SQLiteBoardRepository - Error handling & duplicate constraints', async () 
     (err: unknown) =>
       err instanceof StorageOperationError && err.message.includes('does not exist'),
   );
+
+  repository.close();
+});
+
+test('SQLiteBoardRepository - Soft delete, Trash query (deletedOnly), and Permanent deletion', async () => {
+  const repository = new SQLiteBoardRepository({ dbPath: ':memory:' });
+
+  const board: Board = {
+    metadata: {
+      id: 'trash-test-1',
+      name: 'Trash Board',
+      createdAt: '2026-08-14T00:00:00.000Z',
+      updatedAt: '2026-08-14T00:00:00.000Z',
+      favorite: false,
+    },
+    document: { schemaVersion: 1, records: {} },
+  };
+
+  await repository.createBoard(board);
+
+  // Normal listing shows it
+  let activeList = await repository.listBoards();
+  assert.equal(activeList.length, 1);
+
+  // Trash listing does not show it
+  let trashList = await repository.listBoards({ deletedOnly: true });
+  assert.equal(trashList.length, 0);
+
+  // Soft delete it
+  const softDeleted = await repository.deleteBoard('trash-test-1');
+  assert.equal(softDeleted, true);
+
+  // Normal listing no longer shows it
+  activeList = await repository.listBoards();
+  assert.equal(activeList.length, 0);
+
+  // Trash listing shows it
+  trashList = await repository.listBoards({ deletedOnly: true });
+  assert.equal(trashList.length, 1);
+  assert.equal(trashList[0]?.id, 'trash-test-1');
+
+  // Permanently delete it
+  const permDeleted = await repository.permanentDeleteBoard('trash-test-1');
+  assert.equal(permDeleted, true);
+
+  // Trash listing is now empty
+  trashList = await repository.listBoards({ deletedOnly: true });
+  assert.equal(trashList.length, 0);
+
+  // Restoring non-existent board returns false
+  const restoreFailed = await repository.restoreBoard('trash-test-1');
+  assert.equal(restoreFailed, false);
 
   repository.close();
 });

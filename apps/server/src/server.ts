@@ -3,15 +3,13 @@ import path from 'node:path';
 import fs from 'node:fs';
 import express, { type Express, type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
-import { BoardService } from '@openboard/core';
-import {
-  createBoardRepository,
-  type BoardRepository,
-  type BoardStorage,
-} from '@openboard/storage';
+import { BoardService, CanvasService, BoardEventBus } from '@openboard/core';
+import { createBoardRepository, type BoardRepository, type BoardStorage } from '@openboard/storage';
 import { OpenBoardError } from '@openboard/shared';
 import { createHealthRouter } from './routes/health.js';
 import { createBoardsRouter } from './routes/boards.js';
+import { createCanvasRouter } from './routes/canvas.js';
+import { createLiveSyncRouter } from './routes/live.js';
 
 export interface ServerOptions {
   port?: number;
@@ -19,6 +17,8 @@ export interface ServerOptions {
   repository?: BoardRepository;
   storage?: BoardStorage;
   boardService?: BoardService;
+  canvasService?: CanvasService;
+  eventBus?: BoardEventBus;
   dbPath?: string;
 }
 
@@ -37,6 +37,8 @@ export interface RunningServerInfo {
 export class OpenBoardServer {
   private readonly app: Express;
   private readonly boardService: BoardService;
+  private readonly canvasService: CanvasService;
+  private readonly eventBus: BoardEventBus;
   private server: http.Server | null = null;
   private readonly defaultPort: number;
   private readonly defaultHost: string;
@@ -45,6 +47,8 @@ export class OpenBoardServer {
     this.defaultPort = options.port ?? 3000;
     this.defaultHost = options.host ?? 'localhost';
 
+    this.eventBus = options.eventBus ?? new BoardEventBus();
+
     const repository =
       options.repository ??
       options.storage ??
@@ -52,7 +56,10 @@ export class OpenBoardServer {
         type: 'sqlite',
         dbPath: options.dbPath,
       });
-    this.boardService = options.boardService ?? new BoardService(repository);
+
+    this.boardService = options.boardService ?? new BoardService(repository, this.eventBus);
+    this.canvasService =
+      options.canvasService ?? new CanvasService(this.boardService, this.eventBus);
 
     this.app = express();
     this.setupMiddleware();
@@ -68,6 +75,12 @@ export class OpenBoardServer {
   private setupRoutes(): void {
     // Health check endpoint
     this.app.use('/api', createHealthRouter());
+
+    // Live browser sync SSE endpoint
+    this.app.use('/api/boards', createLiveSyncRouter(this.boardService, this.eventBus));
+
+    // Canvas REST API
+    this.app.use('/api/boards', createCanvasRouter(this.canvasService));
 
     // Boards CRUD API
     this.app.use('/api/boards', createBoardsRouter(this.boardService));
@@ -89,16 +102,30 @@ export class OpenBoardServer {
 
   private setupStaticWebServing(): void {
     try {
-      // Resolve path to apps/web/dist from server module
-      const currentDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
+      let moduleDir = '';
+      try {
+        if (typeof import.meta !== 'undefined' && import.meta.url) {
+          moduleDir = path.dirname(new URL(import.meta.url).pathname);
+        }
+      } catch {
+        // fallback
+      }
+      const currentDir =
+        moduleDir || (typeof __dirname !== 'undefined' ? __dirname : process.cwd());
+
       const possiblePaths = [
-        path.resolve(process.cwd(), 'apps/web/dist'),
-        path.resolve(process.cwd(), '../web/dist'),
+        path.resolve(currentDir, 'web'),
+        path.resolve(currentDir, '../web'),
+        path.resolve(currentDir, '../../apps/web/dist'),
+        path.resolve(currentDir, '../apps/web/dist'),
         path.resolve(currentDir, '../../web/dist'),
         path.resolve(currentDir, '../web/dist'),
+        path.resolve(process.cwd(), 'apps/web/dist'),
+        path.resolve(process.cwd(), '../web/dist'),
+        path.resolve(process.cwd(), 'web'),
       ];
 
-      const webDistPath = possiblePaths.find((p) => fs.existsSync(p));
+      const webDistPath = possiblePaths.find((p) => fs.existsSync(path.join(p, 'index.html')));
 
       if (webDistPath) {
         this.app.use(express.static(webDistPath));
@@ -146,7 +173,10 @@ export class OpenBoardServer {
   /**
    * Starts the HTTP server on the configured port.
    */
-  async start(port: number = this.defaultPort, host: string = this.defaultHost): Promise<RunningServerInfo> {
+  async start(
+    port: number = this.defaultPort,
+    host: string = this.defaultHost,
+  ): Promise<RunningServerInfo> {
     if (this.server) {
       const address = this.server.address();
       const currentPort = typeof address === 'object' && address ? address.port : port;
@@ -161,7 +191,8 @@ export class OpenBoardServer {
       const srv = this.app.listen(port, host, () => {
         this.server = srv;
         const actualAddress = srv.address();
-        const actualPort = typeof actualAddress === 'object' && actualAddress ? actualAddress.port : port;
+        const actualPort =
+          typeof actualAddress === 'object' && actualAddress ? actualAddress.port : port;
         const info: RunningServerInfo = {
           port: actualPort,
           host,
@@ -202,6 +233,14 @@ export class OpenBoardServer {
 
   getBoardService(): BoardService {
     return this.boardService;
+  }
+
+  getCanvasService(): CanvasService {
+    return this.canvasService;
+  }
+
+  getEventBus(): BoardEventBus {
+    return this.eventBus;
   }
 }
 

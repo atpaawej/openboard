@@ -30,7 +30,11 @@ export class TldrawDocumentAdapter {
       return { isValid: false, error: 'Document missing or invalid "schemaVersion"' };
     }
 
-    if (!candidate['records'] || typeof candidate['records'] !== 'object' || Array.isArray(candidate['records'])) {
+    if (
+      !candidate['records'] ||
+      typeof candidate['records'] !== 'object' ||
+      Array.isArray(candidate['records'])
+    ) {
       return { isValid: false, error: 'Document "records" must be a key-value object' };
     }
 
