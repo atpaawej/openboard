@@ -23,15 +23,19 @@ export async function startCommand(options: StartOptions = {}): Promise<void> {
     const info = await server.start();
 
     console.log('');
-    console.log('  ┌──────────────────────────────────────────────┐');
-    console.log('  │                                              │');
-    console.log('  │   ✦ OpenBoard local workspace is active ✦   │');
-    console.log('  │                                              │');
-    console.log(`  │   Dashboard:   \x1b[36m${info.url}\x1b[0m                 │`);
-    console.log(`  │   API Health:  \x1b[32m${info.url}/api/health\x1b[0m      │`);
-    console.log('  │                                              │');
-    console.log('  │   Press Ctrl+C to stop the server            │');
-    console.log('  └──────────────────────────────────────────────┘');
+    console.log('  ┌─────────────────────────────────────────────────────────┐');
+    console.log('  │                                                         │');
+    console.log('  │   ✦ OpenBoard Workspace & MCP Server Active ✦          │');
+    console.log('  │                                                         │');
+    console.log(`  │   Dashboard:     \x1b[36m${info.url}\x1b[0m                            │`);
+    console.log(`  │   API Health:    \x1b[32m${info.url}/api/health\x1b[0m                 │`);
+    console.log(`  │   MCP Endpoint:  \x1b[35m${info.url}/api/mcp\x1b[0m                    │`);
+    console.log(`  │   MCP SSE:       \x1b[35m${info.url}/api/mcp/sse\x1b[0m                │`);
+    console.log('  │                                                         │');
+    console.log('  │   MCP stdio:     \x1b[33mopenboard mcp\x1b[0m                          │');
+    console.log('  │                                                         │');
+    console.log('  │   Press Ctrl+C to stop the server                       │');
+    console.log('  └─────────────────────────────────────────────────────────┘');
     console.log('');
 
     // Open browser if requested (default: true)

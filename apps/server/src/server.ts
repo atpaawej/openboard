@@ -5,11 +5,13 @@ import express, { type Express, type Request, type Response, type NextFunction }
 import cors from 'cors';
 import { BoardService, CanvasService, BoardEventBus } from '@openboard/core';
 import { createBoardRepository, type BoardRepository, type BoardStorage } from '@openboard/storage';
+import { OpenBoardMcpServer } from '@openboard/mcp';
 import { OpenBoardError } from '@openboard/shared';
 import { createHealthRouter } from './routes/health.js';
 import { createBoardsRouter } from './routes/boards.js';
 import { createCanvasRouter } from './routes/canvas.js';
 import { createLiveSyncRouter } from './routes/live.js';
+import { createMcpRouter } from './routes/mcp.js';
 
 export interface ServerOptions {
   port?: number;
@@ -19,6 +21,7 @@ export interface ServerOptions {
   boardService?: BoardService;
   canvasService?: CanvasService;
   eventBus?: BoardEventBus;
+  mcpServer?: OpenBoardMcpServer;
   dbPath?: string;
 }
 
@@ -39,6 +42,7 @@ export class OpenBoardServer {
   private readonly boardService: BoardService;
   private readonly canvasService: CanvasService;
   private readonly eventBus: BoardEventBus;
+  private readonly mcpServer: OpenBoardMcpServer;
   private server: http.Server | null = null;
   private readonly defaultPort: number;
   private readonly defaultHost: string;
@@ -60,6 +64,8 @@ export class OpenBoardServer {
     this.boardService = options.boardService ?? new BoardService(repository, this.eventBus);
     this.canvasService =
       options.canvasService ?? new CanvasService(this.boardService, this.eventBus);
+    this.mcpServer =
+      options.mcpServer ?? new OpenBoardMcpServer(this.boardService, this.canvasService);
 
     this.app = express();
     this.setupMiddleware();
@@ -75,6 +81,10 @@ export class OpenBoardServer {
   private setupRoutes(): void {
     // Health check endpoint
     this.app.use('/api', createHealthRouter());
+
+    // MCP JSON-RPC & SSE endpoints
+    this.app.use('/api/mcp', createMcpRouter(this.mcpServer));
+    this.app.use('/mcp', createMcpRouter(this.mcpServer));
 
     // Live browser sync SSE endpoint
     this.app.use('/api/boards', createLiveSyncRouter(this.boardService, this.eventBus));
@@ -241,6 +251,10 @@ export class OpenBoardServer {
 
   getEventBus(): BoardEventBus {
     return this.eventBus;
+  }
+
+  getMcpServer(): OpenBoardMcpServer {
+    return this.mcpServer;
   }
 }
 

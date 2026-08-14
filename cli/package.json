@@ -1,6 +1,6 @@
 {
   "name": "openboard-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local-first whiteboard for humans and AI agents",
   "type": "module",
   "bin": {
