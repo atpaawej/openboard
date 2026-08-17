@@ -32,13 +32,15 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "cli"
+    "cli",
+    "openboard-web"
   ],
   "scripts": {
     "build:packages": "npm run build --workspace=@openboard/shared --workspace=@openboard/storage --workspace=@openboard/core --workspace=@openboard/mcp",
     "build:apps": "npm run build --workspace=@openboard/web --workspace=@openboard/server",
     "build:cli": "npm run build --workspace=openboard-app",
-    "build": "npm run build:packages && npm run build:apps && npm run build:cli",
+    "build:site": "npm run build --workspace=openboard-web",
+    "build": "npm run build:packages && npm run build:apps && npm run build:cli && npm run build:site",
     "dev": "npm run dev --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",

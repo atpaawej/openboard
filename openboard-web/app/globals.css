@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0c0d10;
+  --foreground: #f3f4f6;
+  --surface: #121318;
+  --surface-raised: #181920;
+  --surface-overlay: #1e2029;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --accent-blue: #2563eb;
+  --accent-blue-hover: #1d4ed8;
+  --accent-blue-glow: rgba(37, 99, 235, 0.18);
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0d10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f222e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3242;
+}
+
+/* Selection */
+::selection {
+  background: rgba(37, 99, 235, 0.35);
+  color: #ffffff;
+}
+
+/* Subtle Glow Effects */
+.glow-blue {
+  box-shadow: 0 0 40px -10px rgba(37, 99, 235, 0.25);
+}
+
+.glow-blue-subtle {
+  box-shadow: 0 0 24px -6px rgba(37, 99, 235, 0.15);
+}
+
+.border-subtle {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.border-strong {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.bg-surface {
+  background-color: #121318;
+}
+
+.bg-surface-raised {
+  background-color: #181920;
+}
+
+.bg-surface-overlay {
+  background-color: #1e2029;
+}
+
+/* Code block typography */
+code, kbd, pre, samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}

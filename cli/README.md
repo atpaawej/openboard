@@ -12,6 +12,14 @@
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js)](package.json)
 
 <br />
+<br />
+
+<p align="center">
+  <img src="./assets/dashboard.png" alt="OpenBoard Workspace Dashboard" width="100%" />
+</p>
+
+<br />
+<br />
 
 ```bash
 # Launch directly without installing:
@@ -26,6 +34,9 @@ openboard start
 
 All whiteboards, documents, and canvas metadata reside locally in your SQLite database:  
 `~/.openboard/openboard.db`
+
+<br />
+<br />
 
 </div>
 
