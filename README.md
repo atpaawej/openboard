@@ -4,15 +4,15 @@
 
 **Local-first personal whiteboard workspace for developers and external AI agents.**
 
-[![Website](https://img.shields.io/badge/website-openboard--web.pages.dev-2563eb?style=flat-square&logo=cloudflare)](https://openboard-web.pages.dev)
+[![Website](https://img.shields.io/badge/website-openboard.aawej.in-2563eb?style=flat-square&logo=cloudflare)](https://openboard.aawej.in)
 [![npm version](https://img.shields.io/npm/v/openboard-app.svg?style=flat-square&color=2563eb)](https://www.npmjs.com/package/openboard-app)
 [![npm downloads](https://img.shields.io/npm/dm/openboard-app.svg?style=flat-square&color=10b981)](https://www.npmjs.com/package/openboard-app)
-[![Documentation](https://img.shields.io/badge/docs-quickstart-06b6d4.svg?style=flat-square)](https://openboard-web.pages.dev/docs/quickstart)
-[![MCP Compatible](https://img.shields.io/badge/MCP-13%20Tools%20(stdio%20%7C%20SSE)-8b5cf6.svg?style=flat-square)](https://openboard-web.pages.dev/docs/mcp-tools)
+[![Documentation](https://img.shields.io/badge/docs-quickstart-06b6d4.svg?style=flat-square)](https://openboard.aawej.in/docs/quickstart)
+[![MCP Compatible](https://img.shields.io/badge/MCP-13%20Tools%20(stdio%20%7C%20SSE)-8b5cf6.svg?style=flat-square)](https://openboard.aawej.in/docs/mcp-tools)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![CI Status](https://img.shields.io/github/actions/workflow/status/atpaawej/openboard/ci.yml?branch=master&style=flat-square&label=CI)](https://github.com/atpaawej/openboard/actions)
 
-[**🌐 Live Website & Docs**](https://openboard-web.pages.dev) • [**⚡ Quickstart**](https://openboard-web.pages.dev/docs/quickstart) • [**🤖 MCP Tools**](https://openboard-web.pages.dev/docs/mcp-tools) • [**📦 npm Package**](https://www.npmjs.com/package/openboard-app)
+[**🌐 Live Website & Docs**](https://openboard.aawej.in) • [**⚡ Quickstart**](https://openboard.aawej.in/docs/quickstart) • [**🤖 MCP Tools**](https://openboard.aawej.in/docs/mcp-tools) • [**📦 npm Package**](https://www.npmjs.com/package/openboard-app)
 
 <br />
 <br />

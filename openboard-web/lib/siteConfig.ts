@@ -3,8 +3,8 @@ export const siteConfig = {
   tagline: 'Local-First Personal Whiteboard for Developers & AI Agents',
   description:
     'OpenBoard is the 100% private, local-first open-source infinite whiteboard pairing an interactive tldraw canvas with a 13-tool Model Context Protocol (MCP) server for Claude Code, Cursor, Codex, and autonomous AI coding agents. Zero cloud dependencies, zero telemetry, stored locally in SQLite.',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://openboard-web.pages.dev',
-  ogImage: 'https://openboard-web.pages.dev/og.png',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://openboard.aawej.in',
+  ogImage: 'https://openboard.aawej.in/og.png',
   creator: 'Aawej',
   githubUrl: 'https://github.com/atpaawej/openboard',
   githubRepo: 'atpaawej/openboard',

@@ -61,6 +61,7 @@ export function constructMetadata({
       description,
       images: [image],
       creator: '@atpaawej',
+      site: '@atpaawej',
     },
     robots: {
       index: true,
