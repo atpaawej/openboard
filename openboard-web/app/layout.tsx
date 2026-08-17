@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { ConditionalLayout } from '@/components/ConditionalLayout';
 import { SoftwareApplicationSchema } from '@/components/JsonLd';
 import { constructMetadata } from '@/lib/seo';
 
@@ -32,9 +31,7 @@ export default function RootLayout({
         <SoftwareApplicationSchema />
       </head>
       <body className="min-h-screen bg-[#0c0d10] text-[#f3f4f6] flex flex-col font-sans antialiased selection:bg-blue-600/30 selection:text-white">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

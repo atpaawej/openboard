@@ -1,102 +1,152 @@
 import React from 'react';
-import { Lock, Cpu, Palette, Eye, Radio, Keyboard, Database, Sparkles } from 'lucide-react';
+import { Lock, Cpu, Zap, Eye, Radio, Keyboard, CheckCircle2 } from 'lucide-react';
+import { TechnicalFrame, SectionFrame } from './ui/TechnicalFrame';
+import { SectionHeader } from './ui/SectionHeader';
+import { EditorialGrid } from './ui/EditorialGrid';
+import { ContentCell } from './ui/ContentCell';
+import { Badge } from './ui/Badge';
 
 export function FeatureGrid() {
-  const features = [
+  const narrativePillars = [
     {
+      index: '01 // SOVEREIGNTY',
+      problem: 'Cloud Whiteboards Leak Proprietary Architecture',
+      problemDesc:
+        'SaaS tools require logins, charge per-seat subscriptions, and upload your confidential database schemas and microservice topology to third-party clouds.',
+      solution: '100% Private Local SQLite',
+      solutionDesc:
+        'All boards, nodes, and metadata live in ~/.openboard/openboard.db. Zero accounts, zero cloud telemetry, fully air-gapped.',
       icon: Lock,
-      color: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10',
-      borderColor: 'border-emerald-500/20',
-      title: 'Local-First & 100% Private',
-      description:
-        'Zero cloud dependencies, zero telemetry, and zero mandatory accounts. All whiteboards, shapes, and metadata live in your local SQLite database (~/.openboard/openboard.db).'
+      badge: 'Local-First',
+      badgeVariant: 'blue' as const,
     },
     {
+      index: '02 // AGENTS',
+      problem: 'AI Coding Assistants Cannot See or Draw Architecture',
+      problemDesc:
+        'Claude Code and Cursor generate thousands of lines of code, but remain blind to visual system topology and cannot sketch or review design documents.',
+      solution: '13 Semantic MCP Tools',
+      solutionDesc:
+        'Built-in Model Context Protocol server unlocks tools to create nodes, draw labeled arrows, group services, and query visual relationships.',
       icon: Cpu,
-      color: 'text-blue-400',
-      bgColor: 'bg-blue-500/10',
-      borderColor: 'border-blue-500/20',
-      title: 'AI Agent Native (MCP)',
-      description:
-        'Built-in Model Context Protocol server exposing 13 semantic tools for Claude Code, Cursor, Codex, and OpenCode to create, inspect, and connect visual nodes.'
+      badge: 'MCP Native',
+      badgeVariant: 'blue' as const,
     },
     {
-      icon: Palette,
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-500/10',
-      borderColor: 'border-purple-500/20',
-      title: 'Twenty-Inspired Dark Workspace',
-      description:
-        'Aesthetic near-black surfaces (#0e0e11), electric blue accents (#2563eb), crisp vector shapes, and zero-dependency SVG iconography built for night owls.'
+      index: '03 // SIMPLICITY',
+      problem: 'Canvas SDKs Require Massive Boilerplate',
+      problemDesc:
+        'Raw drawing SDKs leave you to build persistence, state sync, board managers, trash lifecycles, and export engines entirely from scratch.',
+      solution: 'Instant Zero-Config Workspace',
+      solutionDesc:
+        'Run `npx openboard-app start` to instantly get a full-featured multi-board workspace, dark UI, debounced auto-save, and live SSE updates.',
+      icon: Zap,
+      badge: 'Zero Setup',
+      badgeVariant: 'blue' as const,
     },
+  ];
+
+  const technicalCapabilities = [
     {
+      index: 'CAPABILITY // 01',
       icon: Eye,
-      color: 'text-cyan-400',
-      bgColor: 'bg-cyan-500/10',
-      borderColor: 'border-cyan-500/20',
-      title: 'Headless Canvas Inspection',
+      title: 'Sub-5ms Headless Canvas Inspection',
       description:
-        'AI agents can inspect visual element hierarchies and render pixel-perfect vector SVG snapshots in sub-5ms without needing a heavy headless browser.'
+        'AI agents can inspect canvas element hierarchies and export crisp vector SVG snapshots in milliseconds without requiring heavy headless browsers.',
     },
     {
+      index: 'CAPABILITY // 02',
       icon: Radio,
-      color: 'text-amber-400',
-      bgColor: 'bg-amber-500/10',
-      borderColor: 'border-amber-500/20',
-      title: 'Live Browser Projection (SSE)',
+      title: 'Live Terminal-to-Browser Projection (SSE)',
       description:
-        'When you have OpenBoard open in your browser, mutations from terminal coding agents stream seamlessly into your viewport in real time via Server-Sent Events.'
+        'When your terminal AI agent modifies a whiteboard, mutations stream directly into your browser viewport in real time over Server-Sent Events.',
     },
     {
+      index: 'CAPABILITY // 03',
       icon: Keyboard,
-      color: 'text-rose-400',
-      bgColor: 'bg-rose-500/10',
-      borderColor: 'border-rose-500/20',
-      title: 'Keyboard-First Productivity',
+      title: 'Keyboard-First Flow for Night Owls',
       description:
-        'Press N for new whiteboards, / to focus search, Esc to dismiss modals, Space+Drag to pan, and Cmd+D to duplicate shapes instantly.'
-    }
+        'Press N for new board, / to search, Space+Drag to pan, and Cmd+D to duplicate. Built to keep your hands on the keyboard.',
+    },
   ];
 
   return (
-    <section className="py-20 border-b border-white/5 bg-[#090a0d]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Developer-Grade Architecture</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Engineered for Privacy, Speed, and Autonomy
-          </h2>
-          <p className="text-gray-400 text-sm sm:text-base">
-            Every layer of OpenBoard is crafted to eliminate cloud friction and give developers complete visual control.
-          </p>
+    <SectionFrame withBottomRule withTopRule={false} className="bg-[#0c0d10]">
+      <TechnicalFrame maxWidth="lg" withOuterBorders withTicks withGuides>
+        {/* Header Region */}
+        <div className="px-6 py-10 sm:px-10 border-b border-white/[0.08]">
+          <SectionHeader
+            index="02 // ARCHITECTURE"
+            eyebrow="Developer-Grade System"
+            eyebrowVariant="blue"
+            title="Built for the Problems Engineers Actually Care About"
+            description="We eliminated mandatory cloud logins, expensive seat subscriptions, and text-only AI limitations to give you a private, agent-collaborative canvas."
+            align="left"
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((item, idx) => {
+        {/* 3 Core Problem vs Solution Connected Cells */}
+        <EditorialGrid composition="4-4-4" withOuterBorder={false}>
+          {narrativePillars.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div
+              <ContentCell
                 key={idx}
-                className="p-6 rounded-2xl bg-[#111217] border border-white/5 hover:border-white/15 transition-all space-y-3 group hover:-translate-y-1"
+                metadata={item.index}
+                badge={item.badge}
+                badgeVariant={item.badgeVariant}
+                icon={Icon}
+                withBorderRight={idx !== 2}
+                withBorderBottom
+                padding="lg"
+                className="space-y-4"
               >
-                <div className={`w-10 h-10 rounded-xl ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color}`}>
-                  <Icon className="w-5 h-5" />
+                <div className="space-y-2 pt-2">
+                  <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+                    The Old Friction
+                  </div>
+                  <h4 className="text-sm font-semibold text-zinc-300">
+                    {item.problem}
+                  </h4>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    {item.problemDesc}
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-gray-100 group-hover:text-white transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
+
+                <div className="p-3.5 rounded bg-[#181920] border border-white/[0.08] space-y-1.5 mt-4">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-white">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    <span>{item.solution}</span>
+                  </div>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    {item.solutionDesc}
+                  </p>
+                </div>
+              </ContentCell>
             );
           })}
-        </div>
-      </div>
-    </section>
+        </EditorialGrid>
+
+        {/* 3 Lower Technical Capabilities Connected Matrix */}
+        <EditorialGrid composition="4-4-4" withOuterBorder={false}>
+          {technicalCapabilities.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <ContentCell
+                key={idx}
+                metadata={item.index}
+                icon={Icon}
+                title={item.title}
+                description={item.description}
+                withBorderRight={idx !== 2}
+                withBorderBottom={false}
+                padding="md"
+                variant="subtle"
+              />
+            );
+          })}
+        </EditorialGrid>
+      </TechnicalFrame>
+    </SectionFrame>
   );
 }

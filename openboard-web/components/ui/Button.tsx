@@ -1,54 +1,69 @@
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
 
+export type ButtonVariant = 'brand' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'terminal';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
+
 interface ButtonProps {
   children?: ReactNode;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   href?: string;
   external?: boolean;
   icon?: ReactNode;
+  iconRight?: ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  ariaLabel?: string;
 }
 
 export function Button({
   children,
-  variant = 'primary',
+  variant = 'brand',
   size = 'md',
   href,
   external,
   icon,
+  iconRight,
   className = '',
   onClick,
   type = 'button',
   disabled,
+  ariaLabel,
 }: ButtonProps) {
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-3.5 py-1.5 text-xs sm:text-sm gap-2',
-    lg: 'px-5 py-2.5 text-sm sm:text-base gap-2.5',
-  }[size];
+  const sizeClasses: Record<ButtonSize, string> = {
+    xs: 'px-2 py-0.5 text-xs gap-1.5 rounded',
+    sm: 'px-3 py-1.5 text-xs gap-1.5 rounded-md',
+    md: 'px-4 py-2 text-xs sm:text-sm gap-2 rounded-md',
+    lg: 'px-5 py-2.5 text-sm sm:text-base gap-2.5 rounded-md',
+  };
 
-  const variantClasses = {
+  const variantClasses: Record<ButtonVariant, string> = {
+    brand:
+      'text-white bg-blue-600 hover:bg-blue-500 font-semibold border border-blue-500/40 shadow-sm shadow-blue-950/40 focus-visible:ring-2 focus-visible:ring-blue-500/50 active:scale-[0.98]',
     primary:
-      'text-white bg-blue-600 hover:bg-blue-500 font-semibold shadow-sm shadow-blue-600/20 active:scale-[0.98]',
+      'text-white bg-blue-600 hover:bg-blue-500 font-semibold border border-blue-500/40 shadow-sm shadow-blue-950/40 focus-visible:ring-2 focus-visible:ring-blue-500/50 active:scale-[0.98]',
     secondary:
-      'text-gray-200 bg-[#16171e] hover:bg-[#1e2029] hover:text-white font-medium border border-white/10 hover:border-blue-500/40 active:scale-[0.98]',
+      'text-zinc-200 bg-[#161720] hover:bg-[#1e2029] hover:text-white font-medium border border-white/[0.10] hover:border-white/[0.20] active:scale-[0.98]',
     outline:
-      'text-blue-400 hover:text-blue-300 bg-blue-950/20 hover:bg-blue-950/40 font-semibold border border-blue-500/30 hover:border-blue-500/60 active:scale-[0.98]',
+      'text-zinc-300 hover:text-white bg-white/[0.02] hover:bg-white/[0.06] font-medium border border-white/[0.10] hover:border-blue-500/40 active:scale-[0.98]',
     ghost:
-      'text-gray-400 hover:text-white hover:bg-white/5 font-medium',
-  }[variant];
+      'text-zinc-400 hover:text-white hover:bg-white/[0.04] font-medium active:scale-[0.98]',
+    terminal:
+      'text-zinc-300 bg-[#0c0d10] hover:bg-[#121318] font-mono border border-white/[0.10] hover:border-white/[0.20] active:scale-[0.98]',
+  };
 
-  const combinedClass = `inline-flex items-center justify-center rounded-lg transition-all ${sizeClasses} ${variantClasses} ${className}`;
+  const disabledClasses = disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : '';
+
+  const combinedClass = `inline-flex items-center justify-center font-sans tracking-tight transition-all duration-150 cursor-pointer select-none focus:outline-none ${sizeClasses[size]} ${variantClasses[variant]} ${disabledClasses} ${className}`;
 
   const content = (
     <>
-      {icon}
+      {icon && <span className="shrink-0">{icon}</span>}
       {children && <span>{children}</span>}
+      {iconRight && <span className="shrink-0">{iconRight}</span>}
     </>
   );
 
@@ -60,13 +75,15 @@ export function Button({
           target="_blank"
           rel="noopener noreferrer"
           className={combinedClass}
+          onClick={onClick}
+          aria-label={ariaLabel}
         >
           {content}
         </a>
       );
     }
     return (
-      <Link href={href} className={combinedClass}>
+      <Link href={href} className={combinedClass} onClick={onClick} aria-label={ariaLabel}>
         {content}
       </Link>
     );
@@ -78,6 +95,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={combinedClass}
+      aria-label={ariaLabel}
     >
       {content}
     </button>

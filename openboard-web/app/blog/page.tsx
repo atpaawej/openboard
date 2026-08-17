@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { blogsData } from '@/lib/content';
 import { constructMetadata } from '@/lib/seo';
 import { BreadcrumbSchema } from '@/components/JsonLd';
-import { FileText, Clock, Calendar, ArrowRight, User } from 'lucide-react';
+import { Clock, User } from 'lucide-react';
+import { TechnicalFrame, SectionFrame } from '@/components/ui/TechnicalFrame';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { EditorialGrid } from '@/components/ui/EditorialGrid';
+import { ContentCell } from '@/components/ui/ContentCell';
 
 export const metadata = constructMetadata({
   title: 'Blog & Engineering Knowledge Base',
@@ -14,7 +18,7 @@ export const metadata = constructMetadata({
 
 export default function BlogIndexPage() {
   return (
-    <div className="py-16 sm:py-24">
+    <div className="bg-[#0c0d10]">
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: '/' },
@@ -22,64 +26,55 @@ export default function BlogIndexPage() {
         ]}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Blog Header */}
-        <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 uppercase tracking-wider">
-            <FileText className="w-3.5 h-3.5" />
-            <span>Articles &amp; Architecture Guides</span>
+      <SectionFrame withBottomRule withTopRule={false} className="bg-[#0c0d10]">
+        <TechnicalFrame maxWidth="lg" withOuterBorders withTicks withGuides>
+          {/* Header */}
+          <div className="px-6 py-12 sm:px-10 border-b border-white/[0.08]">
+            <SectionHeader
+              index="ARTICLES // GUIDES"
+              eyebrow="Architecture &amp; MCP Deep Dives"
+              eyebrowVariant="blue"
+              title="Engineering Knowledge Base"
+              description="Exploring the frontiers of local-first canvases, SQLite data sovereignty, and autonomous AI coding agent workflows."
+              align="left"
+            />
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Engineering Knowledge Base
-          </h1>
-          <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-            Exploring the frontiers of local-first canvases, SQLite data sovereignty, and autonomous AI coding agent workflows.
-          </p>
-        </div>
 
-        {/* Blog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogsData.map((blog) => (
-            <Link
-              key={blog.slug}
-              href={`/blog/${blog.slug}`}
-              className="p-6 rounded-2xl bg-[#121318] border border-white/5 hover:border-blue-500/40 hover:bg-[#161720] transition-all flex flex-col justify-between group space-y-5"
-            >
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-1.5">
-                  {blog.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 text-gray-300 border border-white/5"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <h2 className="text-xl font-bold text-gray-100 group-hover:text-white transition-colors leading-snug">
-                  {blog.title}
-                </h2>
-
-                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-3">
-                  {blog.summary}
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500 font-mono">
-                <div className="flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-gray-400" />
-                  <span>{blog.author}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{blog.readTime}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+          {/* Connected Blog Editorial Grid */}
+          <EditorialGrid composition="4-4-4" withOuterBorder={false}>
+            {blogsData.map((blog, idx) => (
+              <Link
+                key={blog.slug}
+                href={`/blog/${blog.slug}`}
+                className="block group h-full"
+              >
+                <ContentCell
+                  metadata={`0${idx + 1} // ${blog.tags[0]?.toUpperCase() || 'ARTICLE'}`}
+                  badge={blog.readTime}
+                  badgeVariant="mono"
+                  title={blog.title}
+                  description={blog.summary}
+                  withBorderRight={idx % 3 !== 2}
+                  withBorderBottom={idx < blogsData.length - (blogsData.length % 3 || 3)}
+                  padding="lg"
+                  variant="interactive"
+                  action={
+                    <div className="flex items-center justify-between text-xs text-zinc-400 font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-zinc-400" />
+                        <span>{blog.author}</span>
+                      </div>
+                      <span className="text-blue-400 font-semibold group-hover:underline">
+                        Read →
+                      </span>
+                    </div>
+                  }
+                />
+              </Link>
+            ))}
+          </EditorialGrid>
+        </TechnicalFrame>
+      </SectionFrame>
     </div>
   );
 }

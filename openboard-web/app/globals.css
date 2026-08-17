@@ -1,20 +1,33 @@
 @import "tailwindcss";
 
 :root {
+  /* Twenty Sacred Color System */
   --background: #0c0d10;
   --foreground: #f3f4f6;
   --surface: #121318;
   --surface-raised: #181920;
   --surface-overlay: #1e2029;
+  
+  /* Structural Border Tokens */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.16);
+  --border-dashed: rgba(255, 255, 255, 0.12);
+  
+  /* Twenty Electric Blue Accent */
   --accent-blue: #2563eb;
   --accent-blue-hover: #1d4ed8;
-  --accent-blue-glow: rgba(37, 99, 235, 0.18);
+  --accent-blue-subtle: rgba(37, 99, 235, 0.12);
   --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  
+  /* Text */
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
   --text-muted: #9ca3af;
   --text-subtle: #6b7280;
+  
   color-scheme: dark;
 }
 
@@ -29,8 +42,8 @@ body {
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -38,12 +51,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1f222e;
-  border-radius: 4px;
+  background: #1e2029;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d3242;
+  background: #2b2e3b;
 }
 
 /* Selection */
@@ -52,15 +65,7 @@ body {
   color: #ffffff;
 }
 
-/* Subtle Glow Effects */
-.glow-blue {
-  box-shadow: 0 0 40px -10px rgba(37, 99, 235, 0.25);
-}
-
-.glow-blue-subtle {
-  box-shadow: 0 0 24px -6px rgba(37, 99, 235, 0.15);
-}
-
+/* Structural Rules & Borders */
 .border-subtle {
   border-color: rgba(255, 255, 255, 0.08);
 }
@@ -69,6 +74,12 @@ body {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
+.border-dashed-subtle {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Surfaces */
 .bg-surface {
   background-color: #121318;
 }
@@ -81,7 +92,7 @@ body {
   background-color: #1e2029;
 }
 
-/* Code block typography */
+/* Typography */
 code, kbd, pre, samp {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }

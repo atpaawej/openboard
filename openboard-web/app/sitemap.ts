@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next';
 import { siteConfig } from '@/lib/siteConfig';
 import { docsData, blogsData, comparisonsData, integrationsData } from '@/lib/content';
 
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteConfig.url;
   const now = new Date();

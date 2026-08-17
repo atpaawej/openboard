@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "openboard-web",
+  "pages_build_output_dir": "out",
+  "compatibility_date": "2026-08-17",
+  "compatibility_flags": ["nodejs_compat"]
+}

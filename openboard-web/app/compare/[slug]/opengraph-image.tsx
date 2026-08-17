@@ -1,6 +1,12 @@
 import { ImageResponse } from 'next/og';
 import { comparisonsData } from '@/lib/content';
 
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return comparisonsData.map((c) => ({ slug: c.slug }));
+}
+
 export const size = {
   width: 1200,
   height: 630,

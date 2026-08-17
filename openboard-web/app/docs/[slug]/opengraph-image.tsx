@@ -1,6 +1,12 @@
 import { ImageResponse } from 'next/og';
 import { docsData } from '@/lib/content';
 
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return docsData.map((d) => ({ slug: d.slug }));
+}
+
 export const size = {
   width: 1200,
   height: 630,

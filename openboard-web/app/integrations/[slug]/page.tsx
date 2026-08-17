@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { integrationsData } from '@/lib/content';
 import { constructMetadata } from '@/lib/seo';
 import { BreadcrumbSchema } from '@/components/JsonLd';
-import { ArrowLeft, Check, Terminal, Code, Laptop, Sparkles } from 'lucide-react';
-import { CopyButton } from '@/components/CopyButton';
-import { siteConfig } from '@/lib/siteConfig';
+import { ArrowLeft } from 'lucide-react';
+import { TechnicalFrame, SectionFrame } from '@/components/ui/TechnicalFrame';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Badge } from '@/components/ui/Badge';
+import { CodeSnippet } from '@/components/ui/CodeSnippet';
+import { Button } from '@/components/ui/Button';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -40,7 +43,7 @@ export default async function IntegrationDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="py-12 sm:py-16">
+    <div className="bg-[#0c0d10]">
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: '/' },
@@ -49,84 +52,83 @@ export default async function IntegrationDetailPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Back Link */}
-        <div>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to home</span>
-          </Link>
-        </div>
+      <SectionFrame withBottomRule withTopRule={false} className="bg-[#0c0d10]">
+        <TechnicalFrame maxWidth="lg" withOuterBorders withTicks withGuides>
+          {/* Header */}
+          <div className="px-6 py-10 sm:px-10 border-b border-white/[0.08] space-y-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to home</span>
+            </Link>
 
-        {/* Integration Header */}
-        <header className="space-y-4">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{integ.badge}</span>
+            <SectionHeader
+              index={`INTEGRATION // ${integ.name.toUpperCase()}`}
+              eyebrow={integ.badge}
+              eyebrowVariant="blue"
+              title={integ.title}
+              description={integ.description}
+              align="left"
+            />
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            {integ.title}
-          </h1>
-
-          <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-            {integ.description}
-          </p>
-        </header>
-
-        {/* Configuration JSON Box */}
-        <div className="rounded-2xl bg-[#121318] border border-white/10 p-6 space-y-3 shadow-xl">
-          <div className="flex items-center justify-between text-xs font-mono text-gray-400">
-            <span>Configuration File Snippet</span>
-            <CopyButton text={integ.configJson} label="Copy JSON" />
+          {/* Configuration JSON Box */}
+          <div className="p-6 sm:p-10 border-b border-white/[0.08] space-y-2 bg-[#0c0d10]">
+            <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+              Server Configuration File (JSON):
+            </div>
+            <CodeSnippet code={integ.configJson} language="json" filename="mcp-server-config.json" />
           </div>
-          <pre className="p-4 rounded-xl bg-[#0c0d10] border border-white/10 font-mono text-xs sm:text-sm text-blue-300 overflow-x-auto">
-            <code>{integ.configJson}</code>
-          </pre>
-        </div>
 
-        {/* Step-by-Step Guide */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-white tracking-tight">
-            Step-by-Step Setup Guide
-          </h2>
-          <div className="space-y-4">
-            {integ.steps.map((step, idx) => (
-              <div
-                key={idx}
-                className="p-5 rounded-xl bg-[#121318] border border-white/5 space-y-3"
-              >
-                <h3 className="text-base font-bold text-gray-100">{step.title}</h3>
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  {step.detail}
-                </p>
-                {step.command && (
-                  <div className="p-3 rounded-lg bg-[#0c0d10] border border-white/10 flex items-center justify-between font-mono text-xs text-gray-200">
-                    <span className="overflow-x-auto">$ {step.command}</span>
-                    <CopyButton text={step.command} label="Copy" />
+          {/* Step-by-Step Guide */}
+          <div className="p-6 sm:p-10 border-b border-white/[0.08] space-y-6 bg-[#0c0d10]">
+            <h2 className="text-lg sm:text-xl font-bold text-white font-mono uppercase tracking-tight">
+              Step-by-Step Setup Guide
+            </h2>
+            <div className="space-y-4">
+              {integ.steps.map((step, idx) => (
+                <div
+                  key={idx}
+                  className="p-5 rounded bg-[#121318] border border-white/[0.08] space-y-2.5"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded bg-[#181920] border border-blue-500/30 text-blue-400 font-mono text-xs font-bold flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <h3 className="font-semibold text-sm sm:text-base text-white">{step.title}</h3>
                   </div>
-                )}
-              </div>
-            ))}
+                  <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed pl-8">{step.detail}</p>
+                  {step.command && (
+                    <div className="pl-8 pt-1">
+                      <CodeSnippet code={step.command} language="bash" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Integration Capabilities */}
-        <div className="p-6 rounded-2xl bg-[#121318] border border-white/5 space-y-4">
-          <h3 className="text-lg font-bold text-white">What You Can Do</h3>
-          <ul className="space-y-2 text-xs sm:text-sm text-gray-300">
-            {integ.features.map((feat, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="text-blue-400 font-bold">✦</span>
-                <span>{feat}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+          {/* Bottom CTA */}
+          <div className="p-8 sm:p-10 text-center space-y-4 bg-[#0c0d10]">
+            <h3 className="text-xl font-bold text-white font-mono uppercase">
+              Need help or additional custom tooling?
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
+              Check the complete reference for all 13 semantic Model Context Protocol tools.
+            </p>
+            <div className="pt-2 flex justify-center gap-3">
+              <Button href="/docs/mcp-tools" variant="brand" size="sm">
+                Explore 13 MCP Tools
+              </Button>
+              <Button href="/docs/quickstart" variant="secondary" size="sm">
+                Quickstart Guide
+              </Button>
+            </div>
+          </div>
+        </TechnicalFrame>
+      </SectionFrame>
     </div>
   );
 }

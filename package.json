@@ -40,6 +40,7 @@
     "build:apps": "npm run build --workspace=@openboard/web --workspace=@openboard/server",
     "build:cli": "npm run build --workspace=openboard-app",
     "build:site": "npm run build --workspace=openboard-web",
+    "deploy:site": "npm run deploy --workspace=openboard-web",
     "build": "npm run build:packages && npm run build:apps && npm run build:cli && npm run build:site",
     "dev": "npm run dev --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

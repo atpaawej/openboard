@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { comparisonsData } from '@/lib/content';
 import { constructMetadata } from '@/lib/seo';
 import { BreadcrumbSchema } from '@/components/JsonLd';
-import { Sparkles, ArrowRight, ShieldCheck, Database, Cpu, CheckCircle2, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { TechnicalFrame, SectionFrame } from '@/components/ui/TechnicalFrame';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { EditorialGrid } from '@/components/ui/EditorialGrid';
+import { ContentCell } from '@/components/ui/ContentCell';
 import { Button } from '@/components/ui/Button';
 
 export const metadata = constructMetadata({
@@ -16,7 +20,7 @@ export const metadata = constructMetadata({
 
 export default function CompareHubPage() {
   return (
-    <div className="py-16 sm:py-24">
+    <div className="bg-[#0c0d10]">
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: '/' },
@@ -24,136 +28,124 @@ export default function CompareHubPage() {
         ]}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Header */}
-        <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Competitive Analysis &amp; Feature Breakdown</span>
+      <SectionFrame withBottomRule withTopRule={false} className="bg-[#0c0d10]">
+        <TechnicalFrame maxWidth="lg" withOuterBorders withTicks withGuides>
+          {/* Header */}
+          <div className="px-6 py-12 sm:px-10 border-b border-white/[0.08]">
+            <SectionHeader
+              index="COMPARE // ALTERNATIVES"
+              eyebrow="Objective Analysis"
+              eyebrowVariant="blue"
+              title="Compare OpenBoard with Alternatives"
+              description="See how OpenBoard compares against proprietary cloud SaaS platforms and browser-only sketchpads for engineering diagrams and AI agent automation."
+              align="left"
+            />
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Compare OpenBoard with Alternatives
-          </h1>
-          <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-            See how OpenBoard compares against proprietary cloud SaaS platforms and browser-only sketchpads for engineering diagrams and AI agent automation.
-          </p>
-        </div>
 
-        {/* 3 Main Comparison Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {comparisonsData.map((item) => (
-            <div
-              key={item.slug}
-              className="p-6 rounded-2xl bg-[#121318] border border-white/10 hover:border-blue-500/40 hover:bg-[#161720] transition-all flex flex-col justify-between space-y-6 group shadow-xl"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20 font-medium">
-                    vs {item.competitor}
-                  </span>
-                  <span className="text-[11px] font-mono text-gray-500">
-                    {item.features.length} criteria
-                  </span>
-                </div>
-
-                <h2 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">
-                  {item.title}
-                </h2>
-
-                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-3">
-                  {item.summary}
-                </p>
-
-                {/* Key Strengths list */}
-                <div className="pt-2 space-y-1.5 border-t border-white/5 text-xs text-gray-300">
-                  <div className="text-[11px] font-mono uppercase text-gray-500">Key Advantages:</div>
-                  {item.pros.slice(0, 2).map((pro, idx) => (
-                    <div key={idx} className="flex items-start gap-1.5">
-                      <span className="text-emerald-400 font-bold">✓</span>
-                      <span className="line-clamp-1">{pro}</span>
+          {/* 3 Main Comparison Connected Cells */}
+          <EditorialGrid composition="4-4-4" withOuterBorder={false}>
+            {comparisonsData.map((item, idx) => (
+              <ContentCell
+                key={item.slug}
+                metadata={`vs ${item.competitor.toUpperCase()}`}
+                badge={`${item.features.length} criteria`}
+                badgeVariant="mono"
+                title={item.title}
+                description={item.summary}
+                withBorderRight={idx !== 2}
+                withBorderBottom
+                padding="lg"
+                action={
+                  <div className="space-y-3">
+                    <div className="space-y-1 text-xs text-zinc-300">
+                      <div className="text-[10px] font-mono uppercase text-zinc-500">Key Advantages:</div>
+                      {item.pros.slice(0, 2).map((pro, pIdx) => (
+                        <div key={pIdx} className="flex items-start gap-1.5">
+                          <span className="text-emerald-400 font-bold">✓</span>
+                          <span className="line-clamp-1 text-zinc-300">{pro}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              <div className="pt-4 border-t border-white/5">
-                <Button
-                  href={`/compare/${item.slug}`}
-                  variant="secondary"
-                  size="sm"
-                  className="w-full justify-between group-hover:border-blue-500/50"
-                  icon={<ArrowRight className="w-3.5 h-3.5 order-last group-hover:translate-x-0.5 transition-transform" />}
-                >
-                  Read Full Comparison
-                </Button>
-              </div>
+                    <Button
+                      href={`/compare/${item.slug}`}
+                      variant="secondary"
+                      size="sm"
+                      className="w-full justify-between"
+                      iconRight={<ArrowRight className="w-3.5 h-3.5" />}
+                    >
+                      Read Full Comparison
+                    </Button>
+                  </div>
+                }
+              />
+            ))}
+          </EditorialGrid>
+
+          {/* High-Level Capability Matrix */}
+          <div className="p-6 sm:p-10 space-y-4 bg-[#0c0d10]">
+            <div className="space-y-1">
+              <h2 className="text-lg sm:text-xl font-bold text-white font-mono tracking-tight uppercase">
+                High-Level Capability Matrix
+              </h2>
+              <p className="text-xs text-zinc-400">
+                Direct comparison across security, local SQLite persistence, AI agent integration, and licensing.
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* Global Capability Matrix */}
-        <div className="rounded-2xl border border-white/10 bg-[#101116] p-6 sm:p-8 space-y-6 shadow-2xl">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-white tracking-tight">
-              High-Level Capability Overview
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-400">
-              Direct comparison of fundamental architecture, AI agent support, and privacy boundaries.
-            </p>
+            <div className="border border-white/[0.08] overflow-hidden">
+              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b border-white/[0.08] bg-[#121318] text-xs text-zinc-400 uppercase font-mono">
+                    <th className="p-3.5">Capability</th>
+                    <th className="p-3.5 text-blue-400 bg-blue-600/5">OpenBoard</th>
+                    <th className="p-3.5">Excalidraw</th>
+                    <th className="p-3.5">Miro</th>
+                    <th className="p-3.5">tldraw SDK</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.06] text-zinc-300 bg-[#0c0d10]">
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="p-3.5 font-semibold text-white">Local SQLite Persistence</td>
+                    <td className="p-3.5 text-emerald-400 font-bold bg-blue-600/[0.02]">✓ Yes (~/.openboard)</td>
+                    <td className="p-3.5 text-zinc-500">Browser Cache</td>
+                    <td className="p-3.5 text-zinc-500">Cloud Only</td>
+                    <td className="p-3.5 text-zinc-500">DIY Custom</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="p-3.5 font-semibold text-white">AI Agent (MCP) Native</td>
+                    <td className="p-3.5 text-emerald-400 font-bold bg-blue-600/[0.02]">✓ 13 Semantic Tools</td>
+                    <td className="p-3.5 text-zinc-500">None</td>
+                    <td className="p-3.5 text-zinc-500">REST API (Paid)</td>
+                    <td className="p-3.5 text-zinc-500">Raw Canvas SDK</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="p-3.5 font-semibold text-white">Zero Cloud Telemetry</td>
+                    <td className="p-3.5 text-emerald-400 font-bold bg-blue-600/[0.02]">✓ 100% Air-Gapped</td>
+                    <td className="p-3.5 text-zinc-400">Opt-out required</td>
+                    <td className="p-3.5 text-red-400">Mandatory Cloud</td>
+                    <td className="p-3.5 text-zinc-400">Depends on host</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="p-3.5 font-semibold text-white">Cost &amp; Licensing</td>
+                    <td className="p-3.5 text-emerald-400 font-bold bg-blue-600/[0.02]">✓ Free / MIT</td>
+                    <td className="p-3.5 text-zinc-300">Free / Paid SaaS</td>
+                    <td className="p-3.5 text-red-400">$8 - $16 / seat / mo</td>
+                    <td className="p-3.5 text-zinc-300">Commercial SDK license</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="p-3.5 font-semibold text-white">Live SSE Browser Projection</td>
+                    <td className="p-3.5 text-emerald-400 font-bold bg-blue-600/[0.02]">✓ Built-in SSE</td>
+                    <td className="p-3.5 text-zinc-500">None</td>
+                    <td className="p-3.5 text-zinc-500">Websockets (Cloud)</td>
+                    <td className="p-3.5 text-zinc-500">DIY sync server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm divide-y divide-white/10">
-              <thead className="bg-[#14151c] text-gray-200">
-                <tr>
-                  <th className="p-3.5 font-semibold">Capability</th>
-                  <th className="p-3.5 font-bold text-blue-400 bg-blue-950/20 border-x border-blue-500/20">✦ OpenBoard</th>
-                  <th className="p-3.5 text-gray-400">Excalidraw</th>
-                  <th className="p-3.5 text-gray-400">Miro</th>
-                  <th className="p-3.5 text-gray-400">tldraw SDK</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 text-gray-300">
-                <tr>
-                  <td className="p-3.5 font-semibold text-gray-100">Storage Architecture</td>
-                  <td className="p-3.5 text-blue-200 bg-blue-950/10 border-x border-blue-500/20 font-medium">Local SQLite</td>
-                  <td className="p-3.5 text-gray-400">Browser LocalStorage</td>
-                  <td className="p-3.5 text-gray-400">Multi-tenant Cloud</td>
-                  <td className="p-3.5 text-gray-400">In-Memory / Custom</td>
-                </tr>
-                <tr>
-                  <td className="p-3.5 font-semibold text-gray-100">Model Context Protocol (MCP)</td>
-                  <td className="p-3.5 text-blue-200 bg-blue-950/10 border-x border-blue-500/20 font-medium">13 Semantic Tools (stdio + SSE)</td>
-                  <td className="p-3.5 text-red-400">None</td>
-                  <td className="p-3.5 text-gray-400">Proprietary REST API</td>
-                  <td className="p-3.5 text-gray-400">None Built-in</td>
-                </tr>
-                <tr>
-                  <td className="p-3.5 font-semibold text-gray-100">Telemetry &amp; Tracking</td>
-                  <td className="p-3.5 text-emerald-400 bg-blue-950/10 border-x border-blue-500/20 font-medium">0% (Zero Telemetry)</td>
-                  <td className="p-3.5 text-gray-400">Low</td>
-                  <td className="p-3.5 text-red-400">Extensive Tracking</td>
-                  <td className="p-3.5 text-gray-400">Zero</td>
-                </tr>
-                <tr>
-                  <td className="p-3.5 font-semibold text-gray-100">Offline &amp; Air-Gapped</td>
-                  <td className="p-3.5 text-emerald-400 bg-blue-950/10 border-x border-blue-500/20 font-medium">100% Offline Capable</td>
-                  <td className="p-3.5 text-gray-300">Offline PWA</td>
-                  <td className="p-3.5 text-red-400">Online Only</td>
-                  <td className="p-3.5 text-gray-300">Depends on host app</td>
-                </tr>
-                <tr>
-                  <td className="p-3.5 font-semibold text-gray-100">Pricing &amp; License</td>
-                  <td className="p-3.5 text-blue-200 bg-blue-950/10 border-x border-blue-500/20 font-medium">Free forever (MIT)</td>
-                  <td className="p-3.5 text-gray-400">Free / Cloud Tier</td>
-                  <td className="p-3.5 text-gray-400">$8 - $20/user/mo</td>
-                  <td className="p-3.5 text-gray-400">MIT / Business Tier</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+        </TechnicalFrame>
+      </SectionFrame>
     </div>
   );
 }

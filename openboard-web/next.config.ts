@@ -4,8 +4,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  output: 'export',
   images: {
-    formats: ['image/avif', 'image/webp'],
+    unoptimized: true,
   },
 };
 

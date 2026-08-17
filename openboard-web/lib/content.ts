@@ -2,7 +2,14 @@ export interface DocItem {
   slug: string;
   title: string;
   subtitle: string;
-  category: 'Getting Started' | 'Architecture' | 'MCP & AI Agents' | 'Reference';
+  category:
+    | 'Getting Started'
+    | 'Core Concepts'
+    | 'MCP & AI Agents'
+    | 'Configuration & CLI'
+    | 'Help & Reference'
+    | 'Architecture'
+    | 'Reference';
   description: string;
   readTime: string;
   lastUpdated: string;
@@ -57,6 +64,47 @@ export interface IntegrationItem {
 
 export const docsData: DocItem[] = [
   {
+    slug: 'overview',
+    title: 'Introduction to OpenBoard',
+    subtitle: 'The 100% private, local-first infinite whiteboard workspace for developers and AI agents.',
+    category: 'Getting Started',
+    description: 'Learn why OpenBoard was created, how it combines local SQLite persistence with 13 semantic MCP tools, and how it differs from cloud SaaS whiteboards.',
+    readTime: '3 min read',
+    lastUpdated: '2026-08-17',
+    toc: [
+      { id: 'what-is-openboard', title: 'What is OpenBoard?' },
+      { id: 'why-openboard', title: 'Why We Built OpenBoard' },
+      { id: 'core-pillars', title: 'The Three Core Pillars' },
+      { id: 'how-it-works', title: 'How OpenBoard Works' },
+    ],
+    content: `
+### What is OpenBoard?
+
+OpenBoard is an open-source, local-first visual whiteboard application engineered for software developers, system architects, and autonomous AI coding agents. It pairs an infinite vector drawing canvas powered by tldraw with an embedded SQLite persistence engine and a native 13-tool Model Context Protocol (MCP) server.
+
+Unlike traditional cloud SaaS whiteboards (Miro, Lucidchart, FigJam) that require mandatory cloud accounts, charge monthly per-seat fees, and transmit confidential architecture diagrams to external cloud servers, OpenBoard operates **100% locally on your machine**.
+
+---
+
+### Why We Built OpenBoard
+
+Modern software engineering teams face two critical problems when diagramming system architecture:
+
+1. **Confidentiality & Cloud Leaks**: Technical architecture diagrams contain your most sensitive intellectual property—database schemas, VPC network boundaries, auth token flows, and microservice topologies. Uploading these to multi-tenant cloud SaaS creates unacceptable compliance and security vulnerabilities.
+2. **AI Assistants are Text-Blind**: Terminal AI assistants like Claude Code, Cursor, Codex, and OpenCode can write thousands of lines of code, but they cannot natively see, sketch, or iterate on visual diagrams without high-level semantic tools.
+
+OpenBoard bridges this divide by providing a fast, zero-telemetry local canvas that both humans and AI agents can manipulate concurrently in real time.
+
+---
+
+### The Three Core Pillars
+
+1. **100% Local SQLite Persistence**: All boards, shapes, connectors, and versions reside solely in \`~/.openboard/openboard.db\` with Write-Ahead Logging (WAL) enabled for sub-millisecond atomic transactions.
+2. **13 Semantic MCP Tools**: High-level JSON-RPC 2.0 tools that allow AI coding agents to create shapes, connect nodes with labeled arrows, group services, and inspect canvas hierarchy deterministically.
+3. **Real-Time Live SSE Sync**: When your AI agent modifies a diagram in the terminal, mutations stream immediately into your browser tab over Server-Sent Events with sub-10ms latency.
+    `
+  },
+  {
     slug: 'quickstart',
     title: 'Quickstart Guide',
     subtitle: 'Get up and running with OpenBoard in under 10 seconds with zero configuration.',
@@ -87,7 +135,7 @@ This command automatically:
 
 ---
 
-### Global Installation
+### Global CLI Installation
 
 If you use OpenBoard daily for system architecture, whiteboard sketching, or AI pair programming, install it globally:
 
@@ -101,7 +149,7 @@ Once installed, use the short CLI command anywhere on your machine:
 # Start workspace server and open browser
 openboard start
 
-# Run in background daemon mode
+# Run in background daemon mode on custom port
 openboard start --port 4747
 
 # Start stdio Model Context Protocol server for AI Agents
@@ -124,8 +172,172 @@ OpenBoard guarantees complete data sovereignty. All whiteboards, canvas document
 
 Once the server is running, visit \`http://localhost:4747\` in your browser:
 - **Responsive Canvas**: Ultra-smooth panning, infinite zoom, and high-performance vector rendering powered by tldraw.
-- **Twenty-Inspired Dark Theme**: Deep charcoal surfaces (\`#0e0e11\`), electric blue accents (\`#2563eb\`), and high legibility.
+- **Twenty-Inspired Dark Theme**: Deep charcoal surfaces (\`#0c0d10\`), electric blue accents (\`#2563eb\`), and high legibility.
 - **Live Agent Synchronization**: Watch external AI coding agents (Claude Code, Cursor, Codex) create and modify shapes in real time over SSE streams.
+    `
+  },
+  {
+    slug: 'installation',
+    title: 'Installation & CLI Setup',
+    subtitle: 'Comprehensive setup instructions for npm, pnpm, yarn, and air-gapped offline environments.',
+    category: 'Getting Started',
+    description: 'Learn how to install OpenBoard across different package managers, configure global bin paths, and set up air-gapped offline environments.',
+    readTime: '3 min read',
+    lastUpdated: '2026-08-17',
+    toc: [
+      { id: 'package-managers', title: 'Package Manager Commands' },
+      { id: 'system-requirements', title: 'System Requirements' },
+      { id: 'offline-air-gapped', title: 'Air-Gapped Offline Setup' },
+      { id: 'verifying-install', title: 'Verifying Installation' },
+    ],
+    content: `
+### Package Manager Commands
+
+OpenBoard is distributed via npm and works with all major Node.js package managers:
+
+\`\`\`bash
+# Using npm
+npm install -g openboard-app
+
+# Using pnpm
+pnpm add -g openboard-app
+
+# Using yarn
+yarn global add openboard-app
+\`\`\`
+
+---
+
+### System Requirements
+
+- **Node.js**: v18.0.0 or higher (v20+ recommended)
+- **Operating Systems**: macOS (Apple Silicon & Intel), Linux (Ubuntu, Debian, Fedora, Arch), Windows (WSL2 or native Node)
+- **Memory Footprint**: < 60 MB RAM for the core daemon and SQLite engine.
+
+---
+
+### Air-Gapped Offline Setup
+
+For isolated enterprise environments with strict outbound firewall policies, OpenBoard can be downloaded as a tarball and run completely offline without ever reaching out to external networks:
+
+\`\`\`bash
+# Launch with explicit localhost binding and offline flag
+openboard start --host 127.0.0.1 --offline
+\`\`\`
+    `
+  },
+  {
+    slug: 'sqlite-storage',
+    title: 'Local SQLite & Data Sovereignty',
+    subtitle: 'Understand how OpenBoard stores all canvas states, shapes, and metadata locally.',
+    category: 'Core Concepts',
+    description: 'Detailed breakdown of OpenBoard SQLite schema, Write-Ahead Logging (WAL), atomic transactions, and backup strategies.',
+    readTime: '4 min read',
+    lastUpdated: '2026-08-17',
+    toc: [
+      { id: 'schema-architecture', title: 'Database Schema Architecture' },
+      { id: 'wal-mode', title: 'Write-Ahead Logging (WAL)' },
+      { id: 'backup-migration', title: 'Backups & Migration' },
+      { id: 'direct-sql-querying', title: 'Direct SQL Querying' },
+    ],
+    content: `
+### Database Schema Architecture
+
+OpenBoard utilizes embedded SQLite with synchronous \`better-sqlite3\` bindings to manage multi-board workspaces. The database is organized into clean relational tables:
+
+- \`boards\`: Stores board UUIDs, titles, descriptions, creation timestamps, and soft-delete (Trash) status flags.
+- \`shapes\`: Stores individual shape records, x/y spatial coordinates, dimensions, types (box, text, arrow, frame), and JSON properties.
+- \`bindings\`: Stores directional arrow bindings connecting source and target shapes.
+- \`assets\`: Stores embedded vector SVGs, image assets, and custom icon definitions.
+
+---
+
+### Write-Ahead Logging (WAL)
+
+OpenBoard enables SQLite **WAL Mode** by default:
+- **Concurrent Access**: CLI commands, terminal AI agents over MCP, and browser UI websockets can read and write concurrently without locking conflicts.
+- **Crash Safety**: In case of sudden machine reboot or terminal interruption, pending transactions are safely recovered from the WAL journal.
+
+---
+
+### Backups & Migration
+
+Because all data lives in a single SQLite file at \`~/.openboard/openboard.db\`, backing up or moving your entire workspace is trivial:
+
+\`\`\`bash
+# Create an instant timestamped backup
+cp ~/.openboard/openboard.db ~/Backups/openboard-$(date +%Y%m%d).db
+
+# Inspect database size and integrity
+sqlite3 ~/.openboard/openboard.db "PRAGMA integrity_check;"
+\`\`\`
+    `
+  },
+  {
+    slug: 'canvas-engine',
+    title: 'Infinite Canvas & Vector Engine',
+    subtitle: 'High-performance vector rendering, smooth panning, and Twenty dark theme aesthetics.',
+    category: 'Core Concepts',
+    description: 'Explore the visual engine behind OpenBoard, including tldraw vector primitives, debounced autosave, and custom visual styling.',
+    readTime: '4 min read',
+    lastUpdated: '2026-08-17',
+    toc: [
+      { id: 'tldraw-integration', title: 'tldraw Integration' },
+      { id: 'vector-rendering', title: 'Vector Rendering Performance' },
+      { id: 'twenty-dark-theme', title: 'Twenty-Inspired Dark Theme' },
+      { id: 'debounced-autosave', title: 'Debounced Autosave Flow' },
+    ],
+    content: `
+### tldraw Integration
+
+OpenBoard uses the industry-leading **tldraw** rendering engine as its core canvas viewport:
+- Infinite 2D vector coordinate space with sub-pixel precision.
+- Freehand pen drawing, geometric shapes (rectangle, ellipse, diamond, cloud), directional arrows, sticky notes, and text entities.
+- Intelligent shape grouping, alignment guides, and container frames.
+
+---
+
+### Twenty-Inspired Dark Theme
+
+OpenBoard is styled using the disciplined **Twenty design system**:
+- **Background**: Deep charcoal \`#0c0d10\` that reduces eye strain during late-night architecture sessions.
+- **Surfaces**: Elevated \`#121318\` / \`#181920\` panels with subtle 1px hairline borders (\`rgba(255, 255, 255, 0.08)\`).
+- **Accents**: High-contrast electric blue (\`#2563eb\`) for active states and semantic status indicators.
+
+---
+
+### Debounced Autosave Flow
+
+Every change made on the canvas is debounced in memory and flushed to SQLite via atomic batch transactions, ensuring zero frame drops during fast drawing.
+    `
+  },
+  {
+    slug: 'sse-live-sync',
+    title: 'Live Server-Sent Events (SSE) Sync',
+    subtitle: 'Real-time terminal-to-browser projection for external AI coding agents.',
+    category: 'Core Concepts',
+    description: 'Learn how OpenBoard uses lightweight Server-Sent Events to stream terminal agent mutations live into your active browser canvas.',
+    readTime: '3 min read',
+    lastUpdated: '2026-08-17',
+    toc: [
+      { id: 'sse-architecture', title: 'SSE Synchronization Architecture' },
+      { id: 'mutation-events', title: 'Mutation Event Protocol' },
+      { id: 'low-latency', title: 'Sub-10ms Latency Flow' },
+    ],
+    content: `
+### SSE Synchronization Architecture
+
+When you open \`http://localhost:4747\` in your browser, the frontend establishes a long-lived **Server-Sent Events (SSE)** connection with the local OpenBoard server:
+
+1. An AI agent in your terminal (e.g. Claude Code) invokes an MCP tool like \`create_shape\` or \`batch_create_shapes\`.
+2. The MCP server writes the new shapes into SQLite and broadcasts a lightweight \`board_updated\` SSE event.
+3. The browser canvas receives the event and renders the new shapes in real time with smooth CSS transitions.
+
+---
+
+### Mutation Event Protocol
+
+Event payloads are optimized JSON packets describing the mutated entity ID, shape properties, and bounding boxes, avoiding full-canvas re-renders.
     `
   },
   {
@@ -278,80 +490,43 @@ For the Claude Desktop app, edit \`claude_desktop_config.json\` located at:
     `
   },
   {
-    slug: 'architecture',
-    title: 'Architecture & Security Model',
-    subtitle: 'Deep dive into OpenBoard SQLite persistence, headless canvas engine, and SSE live sync.',
-    category: 'Architecture',
-    description: 'Understand how OpenBoard delivers sub-millisecond local-first performance with zero telemetry and complete privacy.',
-    readTime: '5 min read',
+    slug: 'headless-engine',
+    title: 'Headless Canvas & SVG Export Engine',
+    subtitle: 'Inspect visual hierarchies and render standalone vector SVGs in sub-5ms without browsers.',
+    category: 'MCP & AI Agents',
+    description: 'Learn how OpenBoard headless engine parses canvas element hierarchies and generates SVG exports directly from CLI scripts.',
+    readTime: '3 min read',
     lastUpdated: '2026-08-17',
     toc: [
-      { id: 'core-architecture', title: 'Core Monorepo Architecture' },
-      { id: 'sqlite-persistence', title: 'SQLite Local Persistence' },
-      { id: 'headless-canvas-engine', title: 'Headless Canvas & SVG Engine' },
-      { id: 'sse-live-sync', title: 'Real-Time Server-Sent Events (SSE)' },
-      { id: 'security-guarantees', title: 'Privacy & Security Guarantees' },
+      { id: 'headless-compilation', title: 'Headless Canvas Compilation' },
+      { id: 'sub-5ms-svg', title: 'Sub-5ms SVG Export Pipeline' },
+      { id: 'cli-svg-export', title: 'CLI Export Command' },
     ],
     content: `
-### Core Monorepo Architecture
+### Headless Canvas Compilation
 
-OpenBoard is architected as a modular TypeScript monorepo designed for maximum performance, minimal resource footprint, and zero vendor lock-in:
+AI agents often need to inspect canvas layouts or generate architecture snapshots without launching a heavy Chromium browser instance. OpenBoard includes a headless canvas compiler in \`@openboard/core\`:
 
+- Evaluates geometric shape bounds and connector bindings entirely in Node.js.
+- Produces a semantic hierarchical tree (\`inspect_canvas\`) for LLM reasoning.
+
+---
+
+### Sub-5ms SVG Export Pipeline
+
+The vector exporter translates tldraw shape definitions into clean, standards-compliant SVG XML with embedded CSS styling in under 5 milliseconds.
+
+\`\`\`bash
+# Export active board to standalone SVG file
+openboard export <board-id> --output ./docs/architecture.svg
 \`\`\`
-┌───────────────────────────────────────────────────────────┐
-│                     EXTERNAL AI AGENT                     │
-│     (Claude Code, Cursor, OpenCode, Codex, Hermes...)     │
-└─────────────────────────────┬─────────────────────────────┘
-                              │ JSON-RPC 2.0 (stdio / SSE)
-                              ▼
-┌───────────────────────────────────────────────────────────┐
-│                   OPENBOARD MCP SERVER                    │
-│               (13 High-Level Semantic Tools)              │
-└──────────────┬─────────────────────────────┬──────────────┘
-               │                             │
-               ▼                             ▼
-┌───────────────────────────┐ ┌─────────────────────────────┐
-│   LOCAL SQLITE DATABASE   │ │   HEADLESS CANVAS ENGINE    │
-│ (~/.openboard/openboard.db│ │  (tldraw store + SVG vector)│
-└───────────────────────────┘ └──────────────┬──────────────┘
-                                             │
-                                             ▼ SSE Live Sync
-                              ┌─────────────────────────────┐
-                              │     BROWSER WHITEBOARD      │
-                              │   (http://localhost:4747)   │
-                              └─────────────────────────────┘
-\`\`\`
-
----
-
-### SQLite Local Persistence
-
-Unlike cloud-based tools (Miro, FigJam, Lucidchart) that hold your data hostage on proprietary servers, OpenBoard persists all data to an embedded **SQLite** database using \`better-sqlite3\` for blazing sub-millisecond synchronous transactions.
-
-- **Storage File**: \`~/.openboard/openboard.db\`
-- **WAL Mode**: Write-Ahead Logging is enabled for safe concurrent writes from CLI, MCP agents, and web UI.
-- **Relational Schema**: Boards, shapes, bindings, assets, and version vectors are neatly structured and queryable using standard SQL.
-
----
-
-### Headless Canvas & SVG Engine
-
-AI agents often need to inspect what is on a whiteboard or generate visual previews without spinning up a heavy browser instance. OpenBoard includes a headless canvas compiler in \`@openboard/core\`:
-- Parses raw canvas state into semantic hierarchies (groups, flowchart trees, text entities).
-- Generates pixel-perfect standalone SVG exports in under 5ms.
-
----
-
-### Real-Time Server-Sent Events (SSE)
-
-When you view a whiteboard at \`http://localhost:4747\`, the browser opens a persistent SSE stream to the local server. When an AI agent executes an MCP tool (e.g. adding 10 nodes to represent a microservice cluster), mutations stream instantly to your open tab without needing manual refresh.
     `
   },
   {
     slug: 'cli-reference',
     title: 'CLI Command Reference',
     subtitle: 'Complete guide to all OpenBoard terminal commands, options, and flags.',
-    category: 'Reference',
+    category: 'Configuration & CLI',
     description: 'Explore the full openboard CLI syntax including start, mcp, export, info, and backup commands.',
     readTime: '3 min read',
     lastUpdated: '2026-08-17',
@@ -405,7 +580,7 @@ openboard export <board-id> --output ./architecture.svg
     slug: 'shortcuts',
     title: 'Keyboard Shortcuts',
     subtitle: 'Boost your visual sketching productivity with keyboard-first shortcuts.',
-    category: 'Reference',
+    category: 'Help & Reference',
     description: 'Master all keyboard shortcuts for rapid whiteboard navigation, tool switching, and canvas management.',
     readTime: '2 min read',
     lastUpdated: '2026-08-17',
@@ -446,6 +621,68 @@ openboard export <board-id> --output ./architecture.svg
 - \`Shift + 1\`: Zoom to fit all elements
 - \`Cmd / Ctrl + D\`: Duplicate selected shapes
 - \`Delete\` or \`Backspace\`: Delete selection
+    `
+  },
+  {
+    slug: 'faq',
+    title: 'FAQ & Troubleshooting',
+    subtitle: 'Common questions, port configurations, database recovery, and debugging tips.',
+    category: 'Help & Reference',
+    description: 'Find solutions to common questions regarding SQLite permissions, MCP agent connection errors, and offline setup.',
+    readTime: '4 min read',
+    lastUpdated: '2026-08-17',
+    toc: [
+      { id: 'port-already-in-use', title: 'Error: Port 4747 Already In Use' },
+      { id: 'mcp-connection-failed', title: 'AI Agent Cannot Connect via MCP' },
+      { id: 'sqlite-permission-denied', title: 'SQLite Database Permission Denied' },
+      { id: 'backing-up-data', title: 'How to Reset or Migrate Database' },
+    ],
+    content: `
+### Error: Port 4747 Already In Use
+
+If port 4747 is currently occupied by another process, launch OpenBoard on a custom port using the \`--port\` flag:
+
+\`\`\`bash
+openboard start --port 4848
+\`\`\`
+
+---
+
+### AI Agent Cannot Connect via MCP
+
+If Claude Code or Cursor reports that the MCP server is unreachable:
+
+1. Ensure the global CLI or npx command is accessible in your shell:
+   \`\`\`bash
+   which openboard
+   \`\`\`
+2. Test stdio initialization directly from terminal:
+   \`\`\`bash
+   openboard mcp --log-level debug
+   \`\`\`
+3. Verify that your agent JSON configuration uses the correct command path:
+   \`\`\`json
+   {
+     "mcpServers": {
+       "openboard": {
+         "command": "npx",
+         "args": ["-y", "openboard-app", "mcp"]
+       }
+     }
+   }
+   \`\`\`
+
+---
+
+### SQLite Database Permission Denied
+
+If your user account lacks permissions to write to \`~/.openboard\`:
+
+\`\`\`bash
+# Create directory and grant user permissions
+mkdir -p ~/.openboard
+chmod 700 ~/.openboard
+\`\`\`
     `
   }
 ];

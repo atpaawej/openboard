@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { blogsData } from '@/lib/content';
 import { constructMetadata } from '@/lib/seo';
 import { BreadcrumbSchema, TechArticleSchema } from '@/components/JsonLd';
-import { ArrowLeft, Clock, Calendar, User, Tag, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, User } from 'lucide-react';
 import { MarkdownContent } from '@/components/MarkdownContent';
 import { CopyButton } from '@/components/CopyButton';
+import { TechnicalFrame, SectionFrame } from '@/components/ui/TechnicalFrame';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 
 interface PageProps {
@@ -44,7 +46,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="py-12 sm:py-16">
+    <div className="bg-[#0c0d10]">
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: '/' },
@@ -59,97 +61,77 @@ export default async function BlogDetailPage({ params }: PageProps) {
         url={`/blog/${blog.slug}`}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Link */}
-        <div className="mb-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to all articles</span>
-          </Link>
-        </div>
+      <SectionFrame withBottomRule withTopRule={false} className="bg-[#0c0d10]">
+        <TechnicalFrame maxWidth="md" withOuterBorders withTicks withGuides>
+          {/* Header */}
+          <div className="p-6 sm:p-10 border-b border-white/[0.08] space-y-4">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to all articles</span>
+            </Link>
 
-        {/* Article Header */}
-        <header className="space-y-4 pb-8 border-b border-white/10">
-          <div className="flex flex-wrap gap-2">
-            {blog.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs font-mono px-2.5 py-1 rounded-full bg-blue-950/50 text-blue-300 border border-blue-500/30"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {blog.tags.map((tag) => (
+                <Badge key={tag} variant="blue">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            {blog.title}
-          </h1>
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              {blog.title}
+            </h1>
 
-          <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-normal">
-            {blog.summary}
-          </p>
+            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed font-normal">
+              {blog.summary}
+            </p>
 
-          <div className="flex flex-wrap items-center gap-6 text-xs text-gray-400 font-mono pt-4">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-300 font-bold text-xs">
-                ✦
+            <div className="flex flex-wrap items-center gap-6 text-xs text-zinc-400 font-mono pt-4 border-t border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <span className="text-zinc-200 font-semibold">{blog.author}</span>
               </div>
-              <span className="text-gray-200 font-semibold">{blog.author}</span>
-              <span className="text-gray-500">({blog.authorRole})</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-gray-500" />
-              <span>{blog.publishedDate}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-gray-500" />
-              <span>{blog.readTime}</span>
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{blog.publishedDate}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{blog.readTime}</span>
+              </div>
             </div>
           </div>
-        </header>
 
-        {/* Article Body using MarkdownContent */}
-        <article className="pt-8">
-          <MarkdownContent content={blog.content} />
-        </article>
+          {/* Article Body */}
+          <article className="p-6 sm:p-10 border-b border-white/[0.08]">
+            <MarkdownContent content={blog.content} />
+          </article>
 
-        {/* Post-article Call to Action Box */}
-        <div className="mt-16 p-6 sm:p-8 rounded-2xl bg-[#121318] border border-blue-500/30 space-y-4 shadow-xl">
-          <div className="flex items-center gap-2 text-blue-400 text-sm font-bold">
-            <Sparkles className="w-4 h-4" />
-            <span>Launch OpenBoard Locally</span>
-          </div>
-          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-            OpenBoard is 100% free and open-source under the MIT license. Launch it immediately in your terminal with zero configuration:
-          </p>
-          <div className="p-3.5 rounded-xl bg-[#0c0d10] border border-white/10 flex items-center justify-between font-mono text-xs sm:text-sm text-gray-200">
-            <div className="flex items-center gap-2 overflow-x-auto">
-              <span className="text-emerald-400 font-bold">$</span>
-              <span>npx openboard-app start</span>
+          {/* Bottom Actions */}
+          <div className="p-6 sm:p-10 bg-[#121318] text-center space-y-4">
+            <h3 className="text-lg sm:text-xl font-bold text-white font-mono uppercase">
+              Try OpenBoard on Your Machine
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
+              100% Free, local-first in SQLite, and zero cloud lock-in.
+            </p>
+            <div className="max-w-xs mx-auto p-2.5 rounded bg-[#0c0d10] border border-white/[0.08] flex items-center justify-between font-mono text-xs text-zinc-200">
+              <span>$ npx openboard-app start</span>
+              <CopyButton text="npx openboard-app start" label="Copy" />
             </div>
-            <CopyButton text="npx openboard-app start" label="Copy" />
+            <div className="pt-2 flex justify-center gap-3">
+              <Button href="/docs/quickstart" variant="brand" size="sm">
+                Get Started
+              </Button>
+              <Button href="/blog" variant="secondary" size="sm">
+                More Articles
+              </Button>
+            </div>
           </div>
-          <div className="pt-2 flex flex-wrap gap-3">
-            <Button
-              href="/docs/quickstart"
-              variant="primary"
-              size="sm"
-            >
-              Get Started with Quickstart
-            </Button>
-            <Button
-              href="/compare"
-              variant="secondary"
-              size="sm"
-            >
-              Compare with Alternatives
-            </Button>
-          </div>
-        </div>
-      </div>
+        </TechnicalFrame>
+      </SectionFrame>
     </div>
   );
 }
