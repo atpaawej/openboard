@@ -28,6 +28,16 @@ export default function RootLayout({
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/logo.svg" />
         <link rel="apple-touch-icon" href="/logo.svg" />
+        <meta property="og:image" content="https://openboard.aawej.in/og.png" />
+        <meta property="og:image:secure_url" content="https://openboard.aawej.in/og.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@atpaawej" />
+        <meta name="twitter:creator" content="@atpaawej" />
+        <meta name="twitter:image" content="https://openboard.aawej.in/og.png" />
+        <meta name="twitter:image:src" content="https://openboard.aawej.in/og.png" />
         <SoftwareApplicationSchema />
       </head>
       <body className="min-h-screen bg-[#0c0d10] text-[#f3f4f6] flex flex-col font-sans antialiased selection:bg-blue-600/30 selection:text-white">
